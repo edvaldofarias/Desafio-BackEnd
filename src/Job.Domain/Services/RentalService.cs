@@ -17,7 +17,7 @@ public sealed class RentalService(
     IMotoboyRepository motoboyRepository
 ) : IRentService
 {
-    public async Task<CommandResponse<string>> CreateRentAsync(CreateRentCommand command,
+    public async Task<CommandResponse<string>> CreateRentAsync(CreateRentalCommand command,
         CancellationToken cancellationToken)
     {
         logger.LogInformation("Iniciando o processo de criação de um aluguel");
@@ -47,7 +47,7 @@ public sealed class RentalService(
         };
     }
 
-    public async Task<CommandResponse<string>> CancelRentAsync(CancelRentCommand command,
+    public async Task<CommandResponse<string>> CancelRentAsync(CancelRentalCommand command,
         CancellationToken cancellationToken)
     {
         logger.LogInformation("Iniciando o processo de cancelamento de um aluguel");
@@ -78,7 +78,7 @@ public sealed class RentalService(
 
     #region private methods
 
-    private async Task<MotoboyEntity?> GetMotoboyEntity(CreateRentCommand command, ValidationResult validate,
+    private async Task<MotoboyEntity?> GetMotoboyEntity(CreateRentalCommand command, ValidationResult validate,
         CancellationToken cancellationToken)
     {
         var motoboy = await motoboyRepository.GetByCnpjAsync(command.Cnpj, cancellationToken);
@@ -96,7 +96,7 @@ public sealed class RentalService(
         return motoboy;
     }
 
-    private async Task<MotoEntity?> GetMotoEntity(CreateRentCommand command, CancellationToken cancellationToken, ValidationResult validate)
+    private async Task<MotoEntity?> GetMotoEntity(CreateRentalCommand command, CancellationToken cancellationToken, ValidationResult validate)
     {
         var moto = await motoRepository.GetByIdAsync(command.IdMoto, cancellationToken);
 

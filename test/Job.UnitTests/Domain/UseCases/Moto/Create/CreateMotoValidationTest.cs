@@ -1,24 +1,23 @@
 ﻿using Job.Commons.Domain.Commands.Moto;
-using Job.Domain.Commands.Moto.Validations;
+using Job.Domain.UseCases.Moto.Create.Commands.Validations;
 
-namespace Job.UnitTests.Domain.Commands.Moto;
+namespace Job.UnitTests.Domain.UseCases.Moto.Create;
 
-[Trait("Validation", "UpdateMotoValidation")]
-public class UpdateMotoValidationTest
+[Trait("Moto", "Create Validation")]
+public class CreateMotoValidationTest
 {
-    private readonly UpdateMotoValidation _validator = new();
+    private readonly CreateMotoValidation _validator = new();
 
     [Fact]
     public void ShouldReturnErrorWhenCommandIsEmpty()
     {
         // Arrange
-        var command = UpdateMotoCommandFaker.Empty().Generate();
+        var command = CreateMotoCommandFaker.Empty().Generate();
 
         // Act
         var result = _validator.TestValidate(command);
 
         // Assert
-        result.ShouldHaveValidationErrorFor(x => x.Id);
         result.ShouldHaveValidationErrorFor(x => x.Year);
         result.ShouldHaveValidationErrorFor(x => x.Model);
         result.ShouldHaveValidationErrorFor(x => x.Plate);
@@ -28,13 +27,12 @@ public class UpdateMotoValidationTest
     public void ShouldReturnErrorWhenModelIsInvalid()
     {
         // Arrange
-        var command = UpdateMotoCommandFaker.Invalid().Generate();
+        var command = CreateMotoCommandFaker.Invalid().Generate();
 
         // Act
         var result = _validator.TestValidate(command);
 
         // Assert
-        result.ShouldHaveValidationErrorFor(x => x.Id);
         result.ShouldHaveValidationErrorFor(x => x.Year);
         result.ShouldHaveValidationErrorFor(x => x.Model);
         result.ShouldHaveValidationErrorFor(x => x.Plate);
@@ -44,15 +42,15 @@ public class UpdateMotoValidationTest
     public void ShouldNotReturnErrorWhenCommandIsValid()
     {
         // Arrange
-        var command = UpdateMotoCommandFaker.Default().Generate();
+        var command = CreateMotoCommandFaker.Default().Generate();
 
         // Act
         var result = _validator.TestValidate(command);
 
         // Assert
-        result.ShouldNotHaveValidationErrorFor(x => x.Id);
         result.ShouldNotHaveValidationErrorFor(x => x.Year);
         result.ShouldNotHaveValidationErrorFor(x => x.Model);
         result.ShouldNotHaveValidationErrorFor(x => x.Plate);
     }
+
 }

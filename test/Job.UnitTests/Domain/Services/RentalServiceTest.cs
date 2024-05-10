@@ -6,6 +6,7 @@ using Job.Domain.Entities.Moto;
 using Job.Domain.Entities.Rental;
 using Job.Domain.Entities.User;
 using Job.Domain.Enums;
+using Job.Domain.Services;
 
 namespace Job.UnitTests.Domain.Services;
 

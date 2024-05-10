@@ -2,6 +2,7 @@
 using Job.Commons.Domain.Entities.Moto;
 using Job.Commons.Domain.Entities.Rental;
 using Job.Domain.Entities.Moto;
+using Job.Domain.Services;
 
 namespace Job.UnitTests.Domain.Services;
 
@@ -19,80 +20,11 @@ public sealed class MotoServiceTest
         _motoService = new MotoService(_logger.Object, _motoRepository.Object, _rentRepository.Object);
     }
 
-    #region CreateAsync
 
-    [Fact]
-    public async Task CreateAsync_WhenCommandIsValid_ShouldCreateMoto()
-    {
-        // Arrange
-        var command = CreateMotoCommandFaker.Default().Generate();
-        _motoRepository.Setup(x => x.CheckPlateExistsAsync(command.Plate, _cancellationToken))
-            .ReturnsAsync(false);
-
-        // Act
-        var response = await _motoService.CreateAsync(command, CancellationToken.None);
-
-        // Assert
-        Assert.NotNull(response);
-        Assert.True(response.Success);
-        _motoRepository.Verify(x => x.CreateAsync(It.IsAny<MotoEntity>(), _cancellationToken), Times.Once);
-    }
-
-    [Fact]
-    public async Task CreateAsync_WhenPlateExists_ShouldReturnError()
-    {
-        // Arrange
-        var command = CreateMotoCommandFaker.Default().Generate();
-        _motoRepository.Setup(x => x.CheckPlateExistsAsync(command.Plate, _cancellationToken))
-            .ReturnsAsync(true);
-
-        // Act
-        var response = await _motoService.CreateAsync(command, CancellationToken.None);
-
-        // Assert
-        Assert.NotNull(response);
-        Assert.False(response.Success);
-        _motoRepository.Verify(x => x.CreateAsync(It.IsAny<MotoEntity>(), _cancellationToken), Times.Never);
-    }
-
-    #endregion
 
     #region UpdateAsync
 
-    [Fact]
-    public async Task UpdateAsync_WhenCommandIsValid_ShouldUpdateMoto()
-    {
-        // Arrange
-        var entity = MotoEntityFaker.Default().Generate();
-        var command = UpdateMotoCommandFaker.Default().Generate();
-        _motoRepository.Setup(x => x.GetByIdAsync(It.IsAny<Guid>(), _cancellationToken))
-            .ReturnsAsync(entity);
 
-        // Act
-        var response = await _motoService.UpdateAsync(command, CancellationToken.None);
-
-        // Assert
-        Assert.NotNull(response);
-        Assert.True(response.Success);
-        _motoRepository.Verify(x => x.UpdateAsync(It.IsAny<MotoEntity>(), _cancellationToken), Times.Once);
-    }
-
-    [Fact]
-    public async Task UpdateAsync_WhenMotoNotFound_ShouldReturnError()
-    {
-        // Arrange
-        var command = UpdateMotoCommandFaker.Default().Generate();
-        _motoRepository.Setup(x => x.GetByIdAsync(It.IsAny<Guid>(), _cancellationToken))
-            .ReturnsAsync((MotoEntity?)null);
-
-        // Act
-        var response = await _motoService.UpdateAsync(command, CancellationToken.None);
-
-        // Assert
-        Assert.NotNull(response);
-        Assert.False(response.Success);
-        _motoRepository.Verify(x => x.UpdateAsync(It.IsAny<MotoEntity>(), _cancellationToken), Times.Never);
-    }
 
     #endregion
 

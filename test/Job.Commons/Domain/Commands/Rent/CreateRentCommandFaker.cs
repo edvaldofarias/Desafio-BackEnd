@@ -7,10 +7,10 @@ namespace Job.Commons.Domain.Commands.Rent;
 
 public static class CreateRentCommandFaker
 {
-    public static Faker<CreateRentCommand> Default()
+    public static Faker<CreateRentalCommand> Default()
     {
-        return new Faker<CreateRentCommand>()
-            .CustomInstantiator(faker => new CreateRentCommand(
+        return new Faker<CreateRentalCommand>()
+            .CustomInstantiator(faker => new CreateRentalCommand(
                 faker.Random.Guid(),
                 faker.Date.Future(),
                 faker.PickRandom<EPlan>()
@@ -20,20 +20,20 @@ public static class CreateRentCommandFaker
             });
     }
 
-    public static Faker<CreateRentCommand> Empty()
+    public static Faker<CreateRentalCommand> Empty()
     {
-        return new Faker<CreateRentCommand>()
-            .CustomInstantiator(_ => new CreateRentCommand(
+        return new Faker<CreateRentalCommand>()
+            .CustomInstantiator(_ => new CreateRentalCommand(
                 Guid.Empty,
                 DateTime.MinValue,
                 0
             ));
     }
 
-    public static Faker<CreateRentCommand> Invalid()
+    public static Faker<CreateRentalCommand> Invalid()
     {
-        return new Faker<CreateRentCommand>()
-            .CustomInstantiator(faker => new CreateRentCommand(
+        return new Faker<CreateRentalCommand>()
+            .CustomInstantiator(faker => new CreateRentalCommand(
                 Guid.Empty,
                 faker.Date.Past(),
                 0

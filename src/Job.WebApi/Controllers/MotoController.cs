@@ -1,5 +1,6 @@
-﻿using Job.Domain.Commands.Moto;
-using Job.Domain.Services.Interfaces;
+﻿using Job.Domain.Services.Interfaces;
+using Job.Domain.UseCases.Moto.Create.Commands;
+using Job.Domain.UseCases.Moto.Update.Commands;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -7,7 +8,8 @@ namespace Job.WebApi.Controllers;
 
 public class MotoController(
     ILogger<MotoController> logger,
-    IMotoService motoService) : BaseController
+    IMotoService motoService,
+    IMediator mediator) : BaseController
 {
     [HttpGet]
     [Authorize(Roles = "admin,motoboy")]
@@ -58,10 +60,10 @@ public class MotoController(
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Create([FromBody] CreateMotoCommand command, CancellationToken cancellationToken)
+    public async Task<IActionResult> Create([FromBody] CreateMotoCommand request, CancellationToken cancellationToken)
     {
         logger.LogInformation("Criando moto");
-        var response = await motoService.CreateAsync(command, cancellationToken);
+        var response = await mediator.Send(request, cancellationToken);
         return HandleResponse(response);
     }
 
@@ -72,10 +74,10 @@ public class MotoController(
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Update([FromBody] UpdateMotoCommand command, CancellationToken cancellationToken)
+    public async Task<IActionResult> Update([FromBody] UpdateMotoCommand request, CancellationToken cancellationToken)
     {
         logger.LogInformation("Atualizando moto");
-        var response = await motoService.UpdateAsync(command, cancellationToken);
+        var response = await mediator.Send(request, cancellationToken);
         return HandleResponse(response);
     }
 

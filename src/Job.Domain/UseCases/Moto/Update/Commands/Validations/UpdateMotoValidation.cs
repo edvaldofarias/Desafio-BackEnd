@@ -1,11 +1,13 @@
-﻿
+﻿namespace Job.Domain.UseCases.Moto.Update.Commands.Validations;
 
-namespace Job.Domain.Commands.Moto.Validations;
-
-public sealed class CreateMotoValidation : AbstractValidator<CreateMotoCommand>
+public sealed class UpdateMotoValidation : AbstractValidator<UpdateMotoCommand>
 {
-    public CreateMotoValidation()
+    public UpdateMotoValidation()
     {
+        RuleFor(x => x.Id)
+            .NotEmpty()
+            .WithMessage("Id é obrigatório");
+
         RuleFor(x => x.Year)
             .NotEmpty()
             .WithMessage("Ano é obrigatório")
@@ -14,9 +16,7 @@ public sealed class CreateMotoValidation : AbstractValidator<CreateMotoCommand>
 
         RuleFor(x => x.Model)
             .NotEmpty()
-            .WithMessage("Modelo é obrigatório")
-            .MinimumLength(3)
-            .WithMessage("Modelo deve ter no mínimo 3 caracteres");
+            .WithMessage("Modelo é obrigatório");
 
         RuleFor(x => x.Plate)
             .NotEmpty()

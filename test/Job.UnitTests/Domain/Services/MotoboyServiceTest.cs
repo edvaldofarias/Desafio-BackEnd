@@ -2,6 +2,7 @@
 using Job.Commons.Domain.Entities.User;
 using Job.Domain.Commons;
 using Job.Domain.Entities.User;
+using Job.Domain.Services;
 
 namespace Job.UnitTests.Domain.Services;
 

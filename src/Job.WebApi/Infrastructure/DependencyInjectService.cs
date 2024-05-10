@@ -1,9 +1,17 @@
 ﻿using FluentValidation;
+using Job.Domain.Commands.Rent;
+using Job.Domain.Commands.Rent.Validations;
 using Job.Domain.Commands.User.Manager;
 using Job.Domain.Commands.User.Manager.Validations;
+using Job.Domain.Commands.User.Motoboy;
+using Job.Domain.Commands.User.Motoboy.Validations;
 using Job.Domain.Repositories;
 using Job.Domain.Services;
 using Job.Domain.Services.Interfaces;
+using Job.Domain.UseCases.Moto.Create.Commands;
+using Job.Domain.UseCases.Moto.Create.Commands.Validations;
+using Job.Domain.UseCases.Moto.Update.Commands;
+using Job.Domain.UseCases.Moto.Update.Commands.Validations;
 using Job.Infrastructure.Context;
 using Job.Infrastructure.Repositories;
 using Job.WebApi.Services;
@@ -45,6 +53,16 @@ public static class DependencyInjectService
 
     private static void RegisterValidation(this IServiceCollection services)
     {
+        services.AddScoped<IValidator<CreateMotoCommand>, CreateMotoValidation>();
+        services.AddScoped<IValidator<UpdateMotoCommand>, UpdateMotoValidation>();
+
+        services.AddScoped<IValidator<CancelRentalCommand>, CancelRentalValidation>();
+        services.AddScoped<IValidator<CreateRentalCommand>, CreateRentalValidation>();
+
         services.AddScoped<IValidator<AuthenticationManagerCommand>, AuthenticationManagerValidation>();
+
+        services.AddScoped<IValidator<AuthenticationMotoboyCommand>, AuthenticationMotoboyValidation>();
+        services.AddScoped<IValidator<CreateMotoboyCommand>, CreateMotoboyValidation>();
+        services.AddScoped<IValidator<UploadCnhMotoboyCommand>, UploadCnhMotoboyValidation>();
     }
 }

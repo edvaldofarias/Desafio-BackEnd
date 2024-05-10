@@ -17,7 +17,7 @@ public sealed class RentalController(
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Create([FromBody] CreateRentCommand command, CancellationToken cancellationToken)
+    public async Task<IActionResult> Create([FromBody] CreateRentalCommand command, CancellationToken cancellationToken)
     {
         logger.LogInformation("Criando aluguel");
         var cnpj = GetCnpj();
@@ -35,7 +35,7 @@ public sealed class RentalController(
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Cancel([FromBody] CancelRentCommand command, CancellationToken cancellationToken)
+    public async Task<IActionResult> Cancel([FromBody] CancelRentalCommand command, CancellationToken cancellationToken)
     {
         logger.LogInformation("Cancelando aluguel");
         var response = await rentService.CancelRentAsync(command, cancellationToken);

@@ -4,6 +4,7 @@ using Job.Domain.Commands.User.Manager;
 using Job.Domain.Commands.User.Manager.Validations;
 using Job.Domain.Commons;
 using Job.Domain.Entities.User;
+using Job.Domain.Services;
 
 namespace Job.UnitTests.Domain.Services;
 

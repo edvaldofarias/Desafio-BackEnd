@@ -1,5 +1,5 @@
 ﻿using Bogus;
-using Job.Domain.Commands.Moto;
+using Job.Domain.UseCases.Moto.Create.Commands;
 
 namespace Job.Commons.Domain.Commands.Moto;
 

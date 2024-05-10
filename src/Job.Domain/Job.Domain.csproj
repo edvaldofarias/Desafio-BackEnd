@@ -9,6 +9,7 @@
     <ItemGroup>
       <PackageReference Include="CloudinaryDotNet" Version="1.26.2" />
       <PackageReference Include="FluentValidation" Version="11.9.1" />
+      <PackageReference Include="MediatR" Version="12.2.0" />
       <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.2.0" />
       <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.1" />
     </ItemGroup>
@@ -17,6 +18,11 @@
       <Reference Include="Microsoft.AspNetCore.Http.Features">
         <HintPath>..\..\..\..\..\..\..\..\Program Files\dotnet\shared\Microsoft.AspNetCore.App\8.0.4\Microsoft.AspNetCore.Http.Features.dll</HintPath>
       </Reference>
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Commands\Moto\" />
+      <Folder Include="UseCases\Moto\Create\" />
     </ItemGroup>
 
 </Project>

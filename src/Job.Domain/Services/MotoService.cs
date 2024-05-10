@@ -1,7 +1,4 @@
 ﻿using Job.Domain.Commands;
-using Job.Domain.Commands.Moto;
-using Job.Domain.Commands.Moto.Validations;
-using Job.Domain.Entities.Moto;
 using Job.Domain.Queries.Moto;
 using Job.Domain.Repositories;
 using Job.Domain.Services.Interfaces;
@@ -13,53 +10,6 @@ public sealed class MotoService(
     IMotoRepository motoRepository,
     IRentalRepository rentalRepository) : IMotoService
 {
-    public async Task<CommandResponse<string>> CreateAsync(CreateMotoCommand command, CancellationToken cancellationToken)
-    {
-        logger.LogInformation("Iniciando o processo de criação de uma moto");
-        var validator = await new CreateMotoValidation().ValidateAsync(command, cancellationToken);
-
-        var moto = new MotoEntity(command.Year, command.Model, command.Plate);
-        logger.LogInformation("Objeto moto criado com sucesso");
-        if (validator.IsValid && await motoRepository.CheckPlateExistsAsync(moto.Plate, cancellationToken))
-        {
-            logger.LogInformation("Placa já cadastrada {plate}", moto.Plate);
-            validator.Errors.Add(new ValidationFailure("Plate", "Placa já cadastrada"));
-        }
-
-        if (validator.IsValid)
-        {
-            logger.LogInformation("Moto criada com sucesso");
-            await motoRepository.CreateAsync(moto, cancellationToken);
-            return new CommandResponse<string>(moto.Id);
-        }
-
-        logger.LogInformation("Erros de validação encontrados {errors}", validator.Errors);
-        return new CommandResponse<string>(validator.Errors);
-    }
-
-    public async Task<CommandResponse<string>> UpdateAsync(UpdateMotoCommand command, CancellationToken cancellationToken)
-    {
-        logger.LogInformation("Iniciando o processo de atualização de uma moto");
-        var validator = await new UpdateMotoValidation().ValidateAsync(command, cancellationToken);
-
-        var moto = await motoRepository.GetByIdAsync(command.Id, cancellationToken);
-        if (moto is null)
-        {
-            logger.LogInformation("Moto não encontrada {id}", command.Id);
-            validator.Errors.Add(new ValidationFailure("Id", "Moto não encontrada"));
-        }
-
-        if (validator.IsValid)
-        {
-            moto!.Update(command.Year, command.Model, command.Plate);
-            logger.LogInformation("Moto atualizada com sucesso");
-            await motoRepository.UpdateAsync(moto, cancellationToken);
-            return new CommandResponse<string>(moto.Id);
-        }
-
-        logger.LogInformation("Erros de validação encontrados {errors}", validator.Errors);
-        return new CommandResponse<string>(validator.Errors);
-    }
 
     public async Task<CommandResponse<string>> DeleteAsync(Guid idMoto, CancellationToken cancellationToken)
     {
