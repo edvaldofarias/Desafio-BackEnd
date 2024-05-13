@@ -7,32 +7,8 @@ namespace Job.Domain.Services;
 
 public sealed class MotoService(
     ILogger<MotoService> logger,
-    IMotoRepository motoRepository,
-    IRentalRepository rentalRepository) : IMotoService
+    IMotoRepository motoRepository) : IMotoService
 {
-
-    public async Task<CommandResponse<string>> DeleteAsync(Guid idMoto, CancellationToken cancellationToken)
-    {
-        logger.LogInformation("Iniciando o processo de exclusão de uma moto");
-        var moto = await motoRepository.GetByIdAsync(idMoto, cancellationToken);
-        if (moto is null)
-        {
-            logger.LogInformation("Moto não encontrada {id}", idMoto);
-            return new CommandResponse<string>(new List<ValidationFailure> { new("Id", "Moto não encontrada") });
-        }
-
-        var rent = await rentalRepository.GetByMotoIdAsync(moto.Id, cancellationToken);
-
-        if(rent is not null && rent.DateEnd > DateOnly.FromDateTime(DateTime.Now))
-        {
-            logger.LogInformation("Moto com aluguel ativo");
-            return new CommandResponse<string>(new List<ValidationFailure> { new("Rental", "Moto com aluguel ativo") });
-        }
-
-        logger.LogInformation("Moto excluída com sucesso");
-        await motoRepository.DeleteAsync(moto, cancellationToken);
-        return new CommandResponse<string>(moto.Id);
-    }
 
     public async Task<IEnumerable<MotoQuery>> GetAllAsync(CancellationToken cancellationToken)
     {

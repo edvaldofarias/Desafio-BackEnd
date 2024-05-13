@@ -10,6 +10,8 @@ using Job.Domain.Services;
 using Job.Domain.Services.Interfaces;
 using Job.Domain.UseCases.Moto.Create.Commands;
 using Job.Domain.UseCases.Moto.Create.Commands.Validations;
+using Job.Domain.UseCases.Moto.Delete.Commands;
+using Job.Domain.UseCases.Moto.Delete.Commands.Validations;
 using Job.Domain.UseCases.Moto.Update.Commands;
 using Job.Domain.UseCases.Moto.Update.Commands.Validations;
 using Job.Infrastructure.Context;
@@ -55,6 +57,7 @@ public static class DependencyInjectService
     {
         services.AddScoped<IValidator<CreateMotoCommand>, CreateMotoValidation>();
         services.AddScoped<IValidator<UpdateMotoCommand>, UpdateMotoValidation>();
+        services.AddScoped<IValidator<DeleteMotoCommand>, DeleteMotoValidation>();
 
         services.AddScoped<IValidator<CancelRentalCommand>, CancelRentalValidation>();
         services.AddScoped<IValidator<CreateRentalCommand>, CreateRentalValidation>();

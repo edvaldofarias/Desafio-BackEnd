@@ -1,5 +1,6 @@
 ﻿using Job.Domain.Services.Interfaces;
 using Job.Domain.UseCases.Moto.Create.Commands;
+using Job.Domain.UseCases.Moto.Delete.Commands;
 using Job.Domain.UseCases.Moto.Update.Commands;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -91,7 +92,7 @@ public class MotoController(
     public async Task<IActionResult> Delete([FromQuery] Guid id, CancellationToken cancellationToken)
     {
         logger.LogInformation("Deletando moto");
-        var response = await motoService.DeleteAsync(id, cancellationToken);
+        var response = await mediator.Send(new DeleteMotoCommand(id), cancellationToken);
         return HandleResponse(response);
     }
 }
