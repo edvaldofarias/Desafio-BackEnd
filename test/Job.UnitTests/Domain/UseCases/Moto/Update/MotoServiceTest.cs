@@ -1,9 +1,9 @@
 ﻿using Job.Commons.Domain.Commands.Moto;
 using Job.Commons.Domain.Entities.Moto;
 using Job.Domain.Entities.Moto;
+using Job.Domain.UseCases.Moto.Update;
 using Job.Domain.UseCases.Moto.Update.Commands;
 using Job.Domain.UseCases.Moto.Update.Commands.Validations;
-using Job.Domain.UseCases.Moto.Update.Services;
 
 namespace Job.UnitTests.Domain.UseCases.Moto.Update;
 

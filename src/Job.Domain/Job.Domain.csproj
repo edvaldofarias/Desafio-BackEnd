@@ -22,7 +22,6 @@
 
     <ItemGroup>
       <Folder Include="Commands\Moto\" />
-      <Folder Include="UseCases\Moto\Create\" />
     </ItemGroup>
 
 </Project>

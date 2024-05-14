@@ -1,5 +1,4 @@
 ﻿using Job.Domain.Commands;
-using Job.Domain.Entities.Moto;
 using Job.Domain.Repositories;
 using Job.Domain.UseCases.Moto.Delete.Commands;
 using MediatR;

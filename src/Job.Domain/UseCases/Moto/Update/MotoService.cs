@@ -3,7 +3,7 @@ using Job.Domain.Repositories;
 using Job.Domain.UseCases.Moto.Update.Commands;
 using MediatR;
 
-namespace Job.Domain.UseCases.Moto.Update.Services;
+namespace Job.Domain.UseCases.Moto.Update;
 
 public sealed class MotoService(
     ILogger<MotoService> logger,

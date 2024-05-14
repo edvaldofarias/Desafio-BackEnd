@@ -4,7 +4,7 @@ using Job.Domain.Repositories;
 using Job.Domain.UseCases.Moto.Create.Commands;
 using MediatR;
 
-namespace Job.Domain.UseCases.Moto.Create.Services;
+namespace Job.Domain.UseCases.Moto.Create;
 
 public sealed class MotoService(
     ILogger<MotoService> logger,

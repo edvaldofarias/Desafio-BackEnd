@@ -1,8 +1,8 @@
 ﻿using Job.Commons.Domain.Commands.Moto;
 using Job.Domain.Entities.Moto;
+using Job.Domain.UseCases.Moto.Create;
 using Job.Domain.UseCases.Moto.Create.Commands;
 using Job.Domain.UseCases.Moto.Create.Commands.Validations;
-using Job.Domain.UseCases.Moto.Create.Services;
 
 namespace Job.UnitTests.Domain.UseCases.Moto.Create;
 
