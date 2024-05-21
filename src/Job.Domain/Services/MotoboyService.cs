@@ -62,49 +62,51 @@ public sealed class MotoboyService(
 
     }
 
-    public async Task<CommandResponse<string>> UploadImageAsync(string cnpj, UploadCnhMotoboyCommand file, CancellationToken cancellationToken)
+    public Task<CommandResponse<string>> UploadImageAsync(string cnpj, UploadCnhMotoboyCommand file, CancellationToken cancellationToken)
     {
         logger.LogInformation("Iniciando upload de imagem");
 
-        var validationFailures = new List<ValidationFailure>();
-        var permittedExtensions = new[] { ".png", ".bmp" };
-        var extension = Path.GetExtension(file.FileDetails.FileName).ToLowerInvariant();
-        var permittedMimeTypes = new[] { "image/png", "image/bmp" };
-        if (!permittedMimeTypes.Contains(file.FileDetails.ContentType) && !permittedExtensions.Contains(extension))
-        {
-            logger.LogInformation("Tipo de arquivo inválido");
-            validationFailures.Add(new ValidationFailure("File", "Tipo de arquivo inválido"));
-            return new CommandResponse<string>(validationFailures);
-        }
+        throw new NotImplementedException();
 
-        logger.LogInformation("Buscando motoboy {cnpj}", cnpj);
-        var motoboy = await motoboyRepository.GetByCnpjAsync(cnpj, cancellationToken);
+        //var validationFailures = new List<ValidationFailure>();
+        //var permittedExtensions = new[] { ".png", ".bmp" };
+        //var extension = Path.GetExtension(file.FileDetails.FileName).ToLowerInvariant();
+        //var permittedMimeTypes = new[] { "image/png", "image/bmp" };
+        //if (!permittedMimeTypes.Contains(file.FileDetails.ContentType) && !permittedExtensions.Contains(extension))
+        //{
+        //    logger.LogInformation("Tipo de arquivo inválido");
+        //    validationFailures.Add(new ValidationFailure("File", "Tipo de arquivo inválido"));
+        //    return new CommandResponse<string>(validationFailures);
+        //}
 
-        if (motoboy is null)
-        {
-            logger.LogError("Motoboy não encontrado");
-            validationFailures.Add(new ValidationFailure("Cnpj", "Motoboy não encontrado"));
-            return new CommandResponse<string>(validationFailures);
-        }
+        //logger.LogInformation("Buscando motoboy {cnpj}", cnpj);
+        //var motoboy = await motoboyRepository.GetByCnpjAsync(cnpj, cancellationToken);
 
-        var stream = file.FileDetails.OpenReadStream();
-        var path = await UploadImage(file.FileDetails.FileName, stream, cancellationToken);
+        //if (motoboy is null)
+        //{
+        //    logger.LogError("Motoboy não encontrado");
+        //    validationFailures.Add(new ValidationFailure("Cnpj", "Motoboy não encontrado"));
+        //    return new CommandResponse<string>(validationFailures);
+        //}
 
-        if(path is null)
-        {
-            logger.LogError("Erro ao realizar upload de imagem");
-            validationFailures.Add(new ValidationFailure("File", "Erro ao realizar upload de imagem"));
-            return new CommandResponse<string>(validationFailures);
-        }
+        //var stream = file.FileDetails.OpenReadStream();
+        //var path = await UploadImage(file.FileDetails.FileName, stream, cancellationToken);
 
-        motoboy.UpdateCnhImage(path);
-        await motoboyRepository.UpdateAsync(motoboy, cancellationToken);
+        //if(path is null)
+        //{
+        //    logger.LogError("Erro ao realizar upload de imagem");
+        //    validationFailures.Add(new ValidationFailure("File", "Erro ao realizar upload de imagem"));
+        //    return new CommandResponse<string>(validationFailures);
+        //}
 
-        logger.LogInformation("Upload de imagem realizado com sucesso");
-        return new CommandResponse<string>(motoboy.Id)
-        {
-            Data = path
-        };
+        //motoboy.UpdateCnhImage(path);
+        //await motoboyRepository.UpdateAsync(motoboy, cancellationToken);
+
+        //logger.LogInformation("Upload de imagem realizado com sucesso");
+        //return new CommandResponse<string>(motoboy.Id)
+        //{
+        //    Data = path
+        //};
     }
 
     #region Private Methods
