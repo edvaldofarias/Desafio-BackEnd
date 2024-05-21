@@ -32,9 +32,12 @@ public class MotoRepository(JobContext context) : IMotoRepository
         return await context.Motos.Where(x => x.Plate == plate).FirstOrDefaultAsync(cancellationToken);
     }
 
-    public async Task<IEnumerable<MotoEntity>> GetAllAsync(CancellationToken cancellationToken)
+    public async Task<IEnumerable<MotoEntity>> GetAllAsync(int quantity, int page, CancellationToken cancellationToken)
     {
-        return await context.Motos.ToListAsync(cancellationToken);
+        return await context.Motos
+            .Skip(quantity * page)
+            .Take(quantity)
+            .ToListAsync(cancellationToken);
     }
 
     public async Task<bool> CheckPlateExistsAsync(string plate, CancellationToken cancellationToken)

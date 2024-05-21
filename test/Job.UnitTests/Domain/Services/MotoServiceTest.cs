@@ -1,6 +1,4 @@
-﻿using Job.Commons.Domain.Commands.Moto;
-using Job.Commons.Domain.Entities.Moto;
-using Job.Commons.Domain.Entities.Rental;
+﻿using Job.Commons.Domain.Entities.Moto;
 using Job.Domain.Entities.Moto;
 using Job.Domain.Services;
 
@@ -19,41 +17,6 @@ public sealed class MotoServiceTest
         _motoService = new MotoService(_logger.Object, _motoRepository.Object);
     }
 
-
-    #region GetAllAsync
-
-    [Fact]
-    public async Task GetAllAsync_WhenMotosExists_ShouldReturnMotos()
-    {
-        // Arrange
-        var entities = MotoEntityFaker.Default().Generate(30);
-        _motoRepository.Setup(x => x.GetAllAsync(_cancellationToken))
-            .ReturnsAsync(entities);
-
-        // Act
-        var response = await _motoService.GetAllAsync(CancellationToken.None);
-
-        // Assert
-        Assert.NotNull(response);
-        Assert.NotEmpty(response);
-    }
-
-    [Fact]
-    public async Task GetAllAsync_WhenMotosNotExists_ShouldReturnEmptyList()
-    {
-        // Arrange
-        _motoRepository.Setup(x => x.GetAllAsync(_cancellationToken))
-            .ReturnsAsync(new List<MotoEntity>());
-
-        // Act
-        var response = await _motoService.GetAllAsync(CancellationToken.None);
-
-        // Assert
-        Assert.NotNull(response);
-        Assert.Empty(response);
-    }
-
-    #endregion
 
     #region GetByIdAsync
 

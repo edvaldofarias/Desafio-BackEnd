@@ -9,6 +9,6 @@ public interface IMotoRepository
     Task DeleteAsync(MotoEntity moto, CancellationToken cancellationToken);
     Task<MotoEntity?> GetByIdAsync(Guid id, CancellationToken cancellationToken);
     Task<MotoEntity?> GetByPlateAsync(string plate, CancellationToken cancellationToken);
-    Task<IEnumerable<MotoEntity>> GetAllAsync(CancellationToken cancellationToken);
+    Task<IEnumerable<MotoEntity>> GetAllAsync(int quantity, int page, CancellationToken cancellationToken);
     Task<bool> CheckPlateExistsAsync(string plate, CancellationToken cancellationToken);
 }

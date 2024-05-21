@@ -1,6 +1,7 @@
 ﻿using Job.Domain.Services.Interfaces;
 using Job.Domain.UseCases.Moto.Create.Commands;
 using Job.Domain.UseCases.Moto.Delete.Commands;
+using Job.Domain.UseCases.Moto.GetAll.Queries;
 using Job.Domain.UseCases.Moto.Update.Commands;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -19,10 +20,10 @@ public class MotoController(
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> GetAll(CancellationToken cancellationToken)
+    public async Task<IActionResult> GetAll([FromQuery] GetAllMotoQuery query, CancellationToken cancellationToken)
     {
         logger.LogInformation("Recuperando todos as motos cadastradas");
-        var motos = await motoService.GetAllAsync(cancellationToken);
+        var motos = await mediator.Send(query, cancellationToken);
         return HandleResponse(motos);
     }
 

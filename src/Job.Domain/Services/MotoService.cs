@@ -10,14 +10,6 @@ public sealed class MotoService(
     IMotoRepository motoRepository) : IMotoService
 {
 
-    public async Task<IEnumerable<MotoQuery>> GetAllAsync(CancellationToken cancellationToken)
-    {
-        logger.LogInformation("Iniciando a busca de todas as motos");
-        var motos = await motoRepository.GetAllAsync(cancellationToken);
-        logger.LogInformation("Busca de todas as motos finalizada com sucesso");
-        return motos.Select(moto => new MotoQuery(moto.Id, moto.Year, moto.Model, moto.Plate));
-    }
-
     public async Task<MotoQuery?> GetByIdAsync(Guid idMoto, CancellationToken cancellationToken)
     {
         logger.LogInformation("Iniciando a busca de uma moto");
