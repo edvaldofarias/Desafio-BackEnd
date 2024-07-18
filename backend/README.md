@@ -55,4 +55,6 @@ Para autenticar como motoboy e necessário fazer o cadastro e utilizar o CNPJ no
 - Code Analyzer: **Microsoft.CodeAnalysis.NetAnalyzers**
 - Projeto para testes de Unidade
 - Projeto para testes de Integração
-- Tratamento de Warning como Error
+- Tratamento de Warning como Erro.
+- Dockerfile para a aplicação e para o banco de dados.
+- Docker Compose para subir a aplicação e o banco de dados.
