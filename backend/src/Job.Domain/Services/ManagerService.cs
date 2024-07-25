@@ -1,7 +1,7 @@
 ﻿using Job.Domain.Commands;
 using Job.Domain.Commands.User.Manager;
 using Job.Domain.Commons;
-using Job.Domain.Queries.User;
+using Job.Domain.Dtos.User;
 using Job.Domain.Repositories;
 using Job.Domain.Services.Interfaces;
 
@@ -12,7 +12,7 @@ public sealed class ManagerService(
     IManagerRepository managerRepository,
     IValidator<AuthenticationManagerCommand> validator) : IManagerService
 {
-    public async Task<CommandResponse<ManagerQuery?>> GetManager(AuthenticationManagerCommand command, CancellationToken cancellationToken = default)
+    public async Task<CommandResponse<ManagerDto?>> GetManager(AuthenticationManagerCommand command, CancellationToken cancellationToken = default)
     {
         logger.LogInformation("Buscando admin {email}", command.Email);
         var validationResult = await validator.ValidateAsync(command, cancellationToken);
@@ -20,19 +20,19 @@ public sealed class ManagerService(
         if(validationResult.IsValid is false)
         {
             logger.LogError("Comando inválido");
-            return new CommandResponse<ManagerQuery?>(validationResult.Errors);
+            return new CommandResponse<ManagerDto?>(validationResult.Errors);
         }
 
         var manager = await managerRepository.GetAsync(command.Email, Cryptography.Encrypt(command.Password), cancellationToken);
         if (manager is null)
         {
             logger.LogError("Manager not found");
-            return new CommandResponse<ManagerQuery?>();
+            return new CommandResponse<ManagerDto?>();
         }
 
         logger.LogInformation("Admin encontrado com sucesso");
-        var query = new ManagerQuery(manager.Id, manager.Email);
-        return new CommandResponse<ManagerQuery?>(query.Id)
+        var query = new ManagerDto(manager.Id, manager.Email);
+        return new CommandResponse<ManagerDto?>(query.Id)
         {
             Data = query
         };

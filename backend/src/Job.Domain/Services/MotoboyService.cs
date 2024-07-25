@@ -4,8 +4,8 @@ using Job.Domain.Commands;
 using Job.Domain.Commands.User.Motoboy;
 using Job.Domain.Commands.User.Motoboy.Validations;
 using Job.Domain.Commons;
+using Job.Domain.Dtos.User;
 using Job.Domain.Entities.User;
-using Job.Domain.Queries.User;
 using Job.Domain.Repositories;
 using Job.Domain.Services.Interfaces;
 
@@ -37,25 +37,25 @@ public sealed class MotoboyService(
         return new CommandResponse<string>(motoboyEntity.Id);
     }
 
-    public async Task<CommandResponse<MotoboyQuery?>> GetMotoboy(AuthenticationMotoboyCommand command, CancellationToken cancellationToken)
+    public async Task<CommandResponse<MotoboyDto?>> GetMotoboy(AuthenticationMotoboyCommand command, CancellationToken cancellationToken)
     {
         logger.LogInformation("Buscando motoboy {cnpj}", command.Cnpj);
         var validate = await new AuthenticationMotoboyValidation().ValidateAsync(command, cancellationToken);
 
         if (!validate.IsValid)
-            return new CommandResponse<MotoboyQuery?>(validate.Errors);
+            return new CommandResponse<MotoboyDto?>(validate.Errors);
 
         var motoboy = await motoboyRepository.GetAsync(CnpjValidation.FormatCnpj(command.Cnpj), Cryptography.Encrypt(command.Password), cancellationToken);
 
         if (motoboy is null)
         {
             logger.LogError("Motoboy não encontrado");
-            return new CommandResponse<MotoboyQuery?>();
+            return new CommandResponse<MotoboyDto?>();
         }
 
         logger.LogInformation("Motoboy encontrado com sucesso");
-        var query = new MotoboyQuery(motoboy.Id, motoboy.Cnpj);
-        return new CommandResponse<MotoboyQuery?>
+        var query = new MotoboyDto(motoboy.Id, motoboy.Cnpj);
+        return new CommandResponse<MotoboyDto?>
         {
             Data = query
         };
