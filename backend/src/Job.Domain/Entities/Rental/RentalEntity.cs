@@ -45,7 +45,7 @@ public sealed class RentalEntity : BaseEntity
 
         if (DateEnd < DatePreview)
         {
-            Fine = 50 * (days * -1);
+            Fine = 50 * days * -1;
             return Fine ?? 0;
         }
 
@@ -53,8 +53,8 @@ public sealed class RentalEntity : BaseEntity
 
         Fine = Plan switch
         {
-            EPlan.Sete => ((Value / (int) Plan) * 0.2m) * days,
-            _ => ((Value / (int) Plan) * 0.4m) * days,
+            EPlan.Sete => Value / (int) Plan * 0.2m * days,
+            _ => Value / (int) Plan * 0.4m * days,
         };
 
         return Fine ?? 0;

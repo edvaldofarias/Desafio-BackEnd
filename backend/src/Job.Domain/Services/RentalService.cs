@@ -1,6 +1,7 @@
 ﻿using Job.Domain.Commands;
 using Job.Domain.Commands.Rent;
 using Job.Domain.Commands.Rent.Validations;
+using Job.Domain.Dtos.Rental;
 using Job.Domain.Entities.Moto;
 using Job.Domain.Entities.Rental;
 using Job.Domain.Entities.User;
@@ -17,7 +18,7 @@ public sealed class RentalService(
     IMotoboyRepository motoboyRepository
 ) : IRentService
 {
-    public async Task<CommandResponse<string>> CreateRentAsync(CreateRentCommand command,
+    public async Task<CommandResponse<RentalDto>> CreateRentAsync(CreateRentCommand command,
         CancellationToken cancellationToken)
     {
         logger.LogInformation("Iniciando o processo de criação de um aluguel");
@@ -31,7 +32,7 @@ public sealed class RentalService(
         if (!validate.IsValid)
         {
             logger.LogInformation("Erros de validação encontrados {errors}", validate.Errors);
-            return new CommandResponse<string>(validate.Errors);
+            return new CommandResponse<RentalDto>(validate.Errors);
         }
 
         logger.LogInformation("Criando objeto aluguel");
@@ -41,13 +42,13 @@ public sealed class RentalService(
         await rentalRepository.CreateAsync(rentEntity, cancellationToken);
 
         logger.LogInformation("Aluguel criado com sucesso");
-        return new CommandResponse<string>(rentEntity.Id)
+        return new CommandResponse<RentalDto>
         {
-            Data = $"Valor do aluguel é de R$ {rentEntity.Value} no plano de {rentEntity.Plan} Dias"
+            Data = new RentalDto(rentEntity.Id, rentEntity.Value, rentEntity.Plan)
         };
     }
 
-    public async Task<CommandResponse<string>> CancelRentAsync(CancelRentCommand command,
+    public async Task<CommandResponse<RentalDto>> CancelRentAsync(CancelRentCommand command,
         CancellationToken cancellationToken)
     {
         logger.LogInformation("Iniciando o processo de cancelamento de um aluguel");
@@ -64,16 +65,16 @@ public sealed class RentalService(
         if (!validate.IsValid)
         {
             logger.LogInformation("Erros de validação encontrados {errors}", validate.Errors);
-            return new CommandResponse<string>(validate.Errors);
+            return new CommandResponse<RentalDto>(validate.Errors);
         }
 
         var fine = rent!.CalculateFine(DateOnly.FromDateTime(command.DatePreview));
         await rentalRepository.UpdateAsync(rent, cancellationToken);
-        var response = new CommandResponse<string>(rent.Id)
+
+        return new CommandResponse<RentalDto>
         {
-            Data = "Valor da multa é de R$ " + fine
+            Data = new RentalDto(rent.Id, rent.Value, rent.Plan, fine)
         };
-        return response;
     }
 
     #region private methods
