@@ -31,7 +31,7 @@
       <ProjectReference Include="..\..\src\Job.Domain\Job.Domain.csproj" />
       <ProjectReference Include="..\..\src\Job.Infrastructure\Job.Infrastructure.csproj" />
       <ProjectReference Include="..\..\src\Job.WebApi\Job.WebApi.csproj" />
-      <ProjectReference Include="..\Job.Commons\Job.Commons.csproj" />
+      <ProjectReference Include="..\Job.CommonsTest\Job.CommonsTest.csproj" />
     </ItemGroup>
 
 </Project>

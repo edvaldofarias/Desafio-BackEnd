@@ -1,4 +1,4 @@
-﻿using Job.Domain.Commands.User.Manager;
+﻿using Job.Application.Commands.Manager;
 
 namespace Job.IntegrationTest.Controllers;
 

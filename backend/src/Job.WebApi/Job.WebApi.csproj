@@ -10,6 +10,8 @@
 
     <ItemGroup>
         <PackageReference Include="FluentResults.Extensions.AspNetCore" Version="0.1.0" />
+        <PackageReference Include="FluentValidation.AspNetCore" Version="11.3.0" />
+        <PackageReference Include="MediatR" Version="12.4.1" />
         <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.7" />
         <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.7" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.7">
@@ -22,8 +24,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\test\Job.Commons\Job.Commons.csproj" />
-      <ProjectReference Include="..\Job.Domain\Job.Domain.csproj" />
+      <ProjectReference Include="..\Job.Application\Job.Application.csproj" />
       <ProjectReference Include="..\Job.Infrastructure\Job.Infrastructure.csproj" />
     </ItemGroup>
 

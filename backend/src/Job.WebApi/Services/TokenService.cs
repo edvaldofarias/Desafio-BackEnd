@@ -4,9 +4,9 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace Job.WebApi.Services;
 
-public sealed class TokenService
+public static class TokenService
 {
-    public string GenerateToken(string name, string role)
+    public static string GenerateToken(string name, string role)
     {
         var tokenHandler = new JwtSecurityTokenHandler();
         var key = "b2e523160e5740e49ec7885759dbb657"u8.ToArray();

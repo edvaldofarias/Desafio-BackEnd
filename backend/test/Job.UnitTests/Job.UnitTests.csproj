@@ -15,6 +15,7 @@
           <PrivateAssets>all</PrivateAssets>
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
+        <PackageReference Include="FluentResults.Extensions.FluentAssertions" Version="2.1.2" />
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.10.0" />
         <PackageReference Include="Moq" Version="4.20.70" />
         <PackageReference Include="xunit" Version="2.9.0" />
@@ -29,8 +30,13 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\..\src\Job.Application\Job.Application.csproj" />
       <ProjectReference Include="..\..\src\Job.Domain\Job.Domain.csproj" />
-      <ProjectReference Include="..\Job.Commons\Job.Commons.csproj" />
+      <ProjectReference Include="..\Job.CommonsTest\Job.CommonsTest.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Domain\Services\" />
     </ItemGroup>
 
 </Project>

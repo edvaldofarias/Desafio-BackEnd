@@ -6,6 +6,7 @@
 # Rider and ReSharper is a .NET coding add-in
 .idea/
 *.sln.iml
+.vscode/
 
 # dotenv files
 .env
