@@ -17,7 +17,7 @@ namespace Job.Infrastructure.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.4")
+                .HasAnnotation("ProductVersion", "8.0.7")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -25,7 +25,6 @@ namespace Job.Infrastructure.Migrations
             modelBuilder.Entity("Job.Domain.Entities.Moto.MotoEntity", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
                     b.Property<DateTime>("Created")
@@ -47,13 +46,12 @@ namespace Job.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Motos");
+                    b.ToTable("Moto", (string)null);
                 });
 
-            modelBuilder.Entity("Job.Domain.Entities.Rental.RentEntity", b =>
+            modelBuilder.Entity("Job.Domain.Entities.Rental.RentalEntity", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
                     b.Property<DateTime>("Created")
@@ -88,7 +86,7 @@ namespace Job.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Rents");
+                    b.ToTable("Rental", (string)null);
                 });
 
             modelBuilder.Entity("Job.Domain.Entities.User.ManagerEntity", b =>
@@ -117,22 +115,21 @@ namespace Job.Infrastructure.Migrations
                     b.HasIndex("Email")
                         .IsUnique();
 
-                    b.ToTable("Managers", (string)null);
+                    b.ToTable("Manager", (string)null);
 
                     b.HasData(
                         new
                         {
-                            Id = new Guid("706b906a-cddf-47d6-8f01-959eeaea99fb"),
-                            Created = new DateTime(2024, 5, 3, 18, 22, 49, 300, DateTimeKind.Local).AddTicks(20),
+                            Id = new Guid("0de94dd6-d8a6-45d9-a40f-2e4907fa137e"),
+                            Created = new DateTime(2024, 9, 30, 12, 4, 8, 46, DateTimeKind.Local).AddTicks(7143),
                             Email = "job@job.com",
-                            Password = "LQvciOgwS1JVt2xclWvuxw=="
+                            Password = "$2a$12$8atmAaWnqBeSigICtB813edOCp8PFoprZLp/TNQNwBeLAYYwVrfn."
                         });
                 });
 
             modelBuilder.Entity("Job.Domain.Entities.User.MotoboyEntity", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
                     b.Property<string>("Cnh")
@@ -168,7 +165,7 @@ namespace Job.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Motoboys");
+                    b.ToTable("Motoboy", (string)null);
                 });
 #pragma warning restore 612, 618
         }

@@ -12,7 +12,7 @@ namespace Job.Infrastructure.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "Managers",
+                name: "Manager",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
@@ -23,11 +23,27 @@ namespace Job.Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Managers", x => x.Id);
+                    table.PrimaryKey("PK_Manager", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
-                name: "Motoboys",
+                name: "Moto",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    Year = table.Column<int>(type: "integer", nullable: false),
+                    Model = table.Column<string>(type: "text", nullable: false),
+                    Plate = table.Column<string>(type: "text", nullable: false),
+                    Created = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
+                    Updated = table.Column<DateTime>(type: "timestamp without time zone", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Moto", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Motoboy",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
@@ -43,27 +59,11 @@ namespace Job.Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Motoboys", x => x.Id);
+                    table.PrimaryKey("PK_Motoboy", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
-                name: "Motos",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    Year = table.Column<int>(type: "integer", nullable: false),
-                    Model = table.Column<string>(type: "text", nullable: false),
-                    Plate = table.Column<string>(type: "text", nullable: false),
-                    Created = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
-                    Updated = table.Column<DateTime>(type: "timestamp without time zone", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Motos", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Rents",
+                name: "Rental",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
@@ -80,17 +80,17 @@ namespace Job.Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Rents", x => x.Id);
+                    table.PrimaryKey("PK_Rental", x => x.Id);
                 });
 
             migrationBuilder.InsertData(
-                table: "Managers",
+                table: "Manager",
                 columns: new[] { "Id", "Created", "Email", "Password", "Updated" },
-                values: new object[] { new Guid("706b906a-cddf-47d6-8f01-959eeaea99fb"), new DateTime(2024, 5, 3, 18, 22, 49, 300, DateTimeKind.Local).AddTicks(20), "job@job.com", "LQvciOgwS1JVt2xclWvuxw==", null });
+                values: new object[] { new Guid("0de94dd6-d8a6-45d9-a40f-2e4907fa137e"), new DateTime(2024, 9, 30, 12, 4, 8, 46, DateTimeKind.Local).AddTicks(7143), "job@job.com", "$2a$12$8atmAaWnqBeSigICtB813edOCp8PFoprZLp/TNQNwBeLAYYwVrfn.", null });
 
             migrationBuilder.CreateIndex(
-                name: "IX_Managers_Email",
-                table: "Managers",
+                name: "IX_Manager_Email",
+                table: "Manager",
                 column: "Email",
                 unique: true);
         }
@@ -99,16 +99,16 @@ namespace Job.Infrastructure.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "Managers");
+                name: "Manager");
 
             migrationBuilder.DropTable(
-                name: "Motoboys");
+                name: "Moto");
 
             migrationBuilder.DropTable(
-                name: "Motos");
+                name: "Motoboy");
 
             migrationBuilder.DropTable(
-                name: "Rents");
+                name: "Rental");
         }
     }
 }
