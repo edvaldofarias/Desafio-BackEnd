@@ -31,8 +31,7 @@ public class ManagerServiceTest
         // Arrange
         var command = AuthenticationManagerCommandFaker.Default().Generate();
         var manager = ManagerEntityFaker.Default().Generate();
-        var password = BCrypt.Net.BCrypt.HashPassword(command.Password, WorkFactor);
-        _managerRepository.Setup(x => x.GetAsync(command.Email, password, _cancellationToken))
+        _managerRepository.Setup(x => x.GetAsync(command.Email, _cancellationToken))
             .ReturnsAsync(manager);
 
         // Act
@@ -40,7 +39,7 @@ public class ManagerServiceTest
 
         // Assert
         response.Should().BeSuccess();
-        _managerRepository.Verify(x => x.GetAsync(command.Email, password, _cancellationToken), Times.Once);
+        _managerRepository.Verify(x => x.GetAsync(command.Email, _cancellationToken), Times.Once);
     }
 
     [Fact]
@@ -48,7 +47,7 @@ public class ManagerServiceTest
     {
         // Arrange
         var command = AuthenticationManagerCommandFaker.Invalid().Generate();
-        _managerRepository.Setup(x => x.GetAsync(It.IsAny<string>(), It.IsAny<string>(), _cancellationToken))
+        _managerRepository.Setup(x => x.GetAsync(It.IsAny<string>(),  _cancellationToken))
             .ReturnsAsync((ManagerEntity?)null);
 
         // Act
@@ -57,7 +56,7 @@ public class ManagerServiceTest
         // Assert
         response.Should().BeFailure();
         response.Errors.Should().HaveCount(2);
-        _managerRepository.Verify(x => x.GetAsync(It.IsAny<string>(), It.IsAny<string>(), _cancellationToken), Times.Never);
+        _managerRepository.Verify(x => x.GetAsync(It.IsAny<string>(), _cancellationToken), Times.Never);
     }
 
     [Fact]
@@ -65,7 +64,7 @@ public class ManagerServiceTest
     {
         // Arrange
         var command = AuthenticationManagerCommandFaker.Default().Generate();
-        _managerRepository.Setup(x => x.GetAsync(It.IsAny<string>(), It.IsAny<string>(), _cancellationToken))
+        _managerRepository.Setup(x => x.GetAsync(It.IsAny<string>(), _cancellationToken))
             .ReturnsAsync((ManagerEntity?)null);
 
         // Act
@@ -74,7 +73,7 @@ public class ManagerServiceTest
         // Assert
         response.Should().BeSuccess();
         response.Value.Should().BeNull();
-        _managerRepository.Verify(x => x.GetAsync(It.IsAny<string>(), It.IsAny<string>(), _cancellationToken), Times.Once);
+        _managerRepository.Verify(x => x.GetAsync(It.IsAny<string>(), _cancellationToken), Times.Once);
     }
 
     #endregion

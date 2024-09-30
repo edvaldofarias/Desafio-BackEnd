@@ -378,9 +378,6 @@
 			"item": [
 				{
 					"name": "Create",
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
 					"request": {
 						"auth": {
 							"type": "bearer",
@@ -392,11 +389,11 @@
 								}
 							]
 						},
-						"method": "GET",
+						"method": "POST",
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n  \"idMoto\": \"3fa85f64-5717-4562-b3fc-2c963f66afa6\",\r\n  \"datePreview\": \"2024-09-28T19:44:01.801Z\",\r\n  \"plan\": 7\r\n}",
+							"raw": "{\r\n  \"idMoto\": \"14d13f2d-5e2f-49e0-a7d1-95a89787ad5f\",\r\n  \"datePreview\": \"2025-09-30T19:44:01.801Z\",\r\n  \"plan\": 7\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -417,10 +414,7 @@
 					"response": []
 				},
 				{
-					"name": "New Request",
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
+					"name": "Cancel",
 					"request": {
 						"auth": {
 							"type": "bearer",
@@ -432,11 +426,11 @@
 								}
 							]
 						},
-						"method": "GET",
+						"method": "PUT",
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n  \"id\": \"3fa85f64-5717-4562-b3fc-2c963f66afa6\",\r\n  \"datePreview\": \"2024-09-28T19:45:10.803Z\"\r\n}",
+							"raw": "{\r\n  \"id\": \"fdc319f4-0010-4dcf-92a7-022552364b54\",\r\n  \"datePreview\": \"2024-10-28T19:45:10.803Z\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"

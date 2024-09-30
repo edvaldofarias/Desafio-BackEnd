@@ -37,11 +37,11 @@ public sealed class RentalService(
             return Result.Fail(validate.Errors.Select(x => x.ErrorMessage));
         }
 
-        var fine = rent!.CalculateFine(DateOnly.FromDateTime(request.DatePreview));
+        rent!.CalculateFine(DateOnly.FromDateTime(request.DatePreview));
         await rentalRepository.UpdateAsync(rent, cancellationToken);
 
-        var rentalDto = new RentalDto(rent.Id, rent.Value, rent.Plan, fine);
-        return Result.Ok(rentalDto);
+        var rentalDto = new RentalDto(rent.Id, rent.Value, rent.Plan, rent.Fine);
+        return Result.Ok(rentalDto).WithSuccess("Cancelamento realizado com sucesso");
     }
 
     public async Task<Result<RentalDto>> Handle(CreateRentalCommand request, CancellationToken cancellationToken)

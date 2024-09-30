@@ -24,16 +24,15 @@ public sealed class ManagerService(
             return Result.Fail(validationResult.Errors.Select(x => x.ErrorMessage));
         }
 
-        var password = BCrypt.Net.BCrypt.HashPassword(request.Password, WorkFactor);
-        var manager = await managerRepository.GetAsync(request.Email, password, cancellationToken);
-        if (manager is null)
+        var manager = await managerRepository.GetAsync(request.Email, cancellationToken);
+        if (manager is not null && BCrypt.Net.BCrypt.Verify(request.Password, manager?.Password))
         {
-            logger.LogError("Manager not found");
-            return Result.Ok();
+            logger.LogInformation("Admin encontrado com sucesso");
+            var query = new ManagerDto(manager!.Id, manager.Email);
+            return Result.Ok(query);
         }
 
-        logger.LogInformation("Admin encontrado com sucesso");
-        var query = new ManagerDto(manager.Id, manager.Email);
-        return Result.Ok(query);
+        logger.LogError("Manager not found");
+        return Result.Ok().WithError("Senha ou email inválidos");
     }
 }

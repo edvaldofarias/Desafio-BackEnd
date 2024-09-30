@@ -26,18 +26,17 @@ public sealed class MotoboyService(ILogger<MotoboyService> logger, IMotoboyRepos
             return Result.Fail(validate.Errors.Select(x => x.ErrorMessage));
 
         var cnpj = CnpjValidation.FormatCnpj(request.Cnpj);
-        var password = BCrypt.Net.BCrypt.HashPassword(request.Password, WorkFactor);
-        var motoboy = await motoboyRepository.GetAsync(cnpj, password, cancellationToken);
+        var motoboy = await motoboyRepository.GetByCnpjAsync(cnpj, cancellationToken);
 
-        if (motoboy is null)
+        if (motoboy is not null && BCrypt.Net.BCrypt.Verify(request.Password, motoboy.Password))
         {
-            logger.LogError("Motoboy não encontrado");
-            return Result.Ok();
+            logger.LogInformation("Motoboy encontrado com sucesso");
+            var query = new MotoboyDto(motoboy.Id, motoboy.Cnpj);
+            return Result.Ok(query);
         }
 
-        logger.LogInformation("Motoboy encontrado com sucesso");
-        var query = new MotoboyDto(motoboy.Id, motoboy.Cnpj);
-        return Result.Ok(query);
+        logger.LogError("Motoboy não encontrado");
+        return Result.Ok();
     }
 
     public async Task<Result> Handle(CreateMotoboyCommand request, CancellationToken cancellationToken)

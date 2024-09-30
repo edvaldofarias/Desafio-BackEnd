@@ -19,7 +19,7 @@ public static class DependencyInjectService
             options.UseNpgsql(configuration.GetConnectionString("DefaultConnection"));
         });
 
-        var applicationAssembly = Assembly.Load("Job.Infrastructure");
+        var applicationAssembly = Assembly.Load("Job.Application");
 
         services.RegisterRepository();
         services.RegisterValidation();
