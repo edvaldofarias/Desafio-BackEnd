@@ -1,4 +1,5 @@
-﻿using Job.Application.Commands.Manager;
+﻿using Bogus;
+using Job.Application.Commands.Manager;
 using Job.Application.Commands.Manager.Validations;
 using Job.Application.Repositories;
 using Job.Application.Services;
@@ -29,8 +30,9 @@ public class ManagerServiceTest
     public async Task GetManager_WhenCommandIsValid_ShouldReturnManager()
     {
         // Arrange
-        var command = AuthenticationManagerCommandFaker.Default().Generate();
-        var manager = ManagerEntityFaker.Default().Generate();
+        var password = new Faker().Internet.Password();
+        var manager = ManagerEntityFaker.Default(password).Generate();
+        var command = AuthenticationManagerCommandFaker.Default(password).Generate();
         _managerRepository.Setup(x => x.GetAsync(command.Email, _cancellationToken))
             .ReturnsAsync(manager);
 
@@ -71,8 +73,7 @@ public class ManagerServiceTest
         var response = await _managerService.Handle(command, CancellationToken.None);
 
         // Assert
-        response.Should().BeSuccess();
-        response.Value.Should().BeNull();
+        response.Should().BeFailure();
         _managerRepository.Verify(x => x.GetAsync(It.IsAny<string>(), _cancellationToken), Times.Once);
     }
 

@@ -19,7 +19,7 @@ public class ManagerControllerTest(SetupFactory factory) : IClassFixture<SetupFa
         var response = await client.PostAsJsonAsync("/manager/authentication", content);
 
         // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
     }
 
     [Fact]

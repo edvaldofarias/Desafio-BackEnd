@@ -1,4 +1,5 @@
-﻿using Job.Application.Repositories;
+﻿using Bogus;
+using Job.Application.Repositories;
 using Job.Application.Services;
 using Job.Commons.Domain.Commands.User.Motoboy;
 using Job.Commons.Domain.Entities.User;
@@ -27,11 +28,11 @@ public class MotoboyServiceTest
     public async Task Authentication_WhenCommandIsValid_ShouldReturnMotoboy()
     {
         // Arrange
-        var command = AuthenticationMotoboyCommandFaker.Default().Generate();
-        var motoboy = MotoboyEntityFaker.Default().Generate();
+        var password = new Faker().Internet.Password();
+        var command = AuthenticationMotoboyCommandFaker.Default(password).Generate();
+        var motoboy = MotoboyEntityFaker.Default(password).Generate();
         var cnpj = CnpjValidation.FormatCnpj(command.Cnpj);
-        var password = BCrypt.Net.BCrypt.HashPassword(command.Password, WorkFactor);
-        _managerRepository.Setup(x => x.GetAsync(cnpj, password, _cancellationToken))
+        _managerRepository.Setup(x => x.GetByCnpjAsync(cnpj, _cancellationToken))
             .ReturnsAsync(motoboy);
 
         // Act
@@ -40,7 +41,7 @@ public class MotoboyServiceTest
         // Assert
         response.Should().BeSuccess();
         response.Value.Should().NotBeNull();
-        _managerRepository.Verify(x => x.GetAsync(It.IsAny<string>(), password, _cancellationToken), Times.Once);
+        _managerRepository.Verify(x => x.GetByCnpjAsync(It.IsAny<string>(), _cancellationToken), Times.Once);
     }
 
     [Fact]
@@ -48,7 +49,7 @@ public class MotoboyServiceTest
     {
         // Arrange
         var command = AuthenticationMotoboyCommandFaker.Default().Generate();
-        _managerRepository.Setup(x => x.GetAsync(It.IsAny<string>(), command.Password, _cancellationToken))
+        _managerRepository.Setup(x => x.GetByCnpjAsync(It.IsAny<string>(), _cancellationToken))
             .ReturnsAsync((MotoboyEntity?)null);
         var password = BCrypt.Net.BCrypt.HashPassword(command.Password, WorkFactor);
 
@@ -58,7 +59,7 @@ public class MotoboyServiceTest
         // Assert
         response.Should().BeSuccess();
         response.Value.Should().BeNull();
-        _managerRepository.Verify(x => x.GetAsync(It.IsAny<string>(), password, _cancellationToken), Times.Once);
+        _managerRepository.Verify(x => x.GetByCnpjAsync(It.IsAny<string>(), _cancellationToken), Times.Once);
     }
 
     [Fact]
