@@ -1,6 +1,11 @@
 # Introdução
 
-Projetos feitos para o processo seletivo, com o objetivo de criar uma aplicação para gerenciamento de aluguel de motos.
+Projetos desenvolvidos durante o processo seletivo, com o objetivo específico de criar uma aplicação 
+abrangente e funcional para o gerenciamento eficiente de aluguel de motocicletas. 
+Estes projetos não apenas demonstram habilidades técnicas, mas também abordam desafios 
+práticos do mundo real no setor de aluguel de veículos, incorporando funcionalidades 
+como cadastro de clientes, controle de estoque de motocicletas, agendamento de aluguéis, 
+e geração de relatórios financeiros.
 
 ## Introdução para execução
 
@@ -21,6 +26,10 @@ No MacOS, para criar as variáveis de ambiente permanentemente, é necessário e
 export ASPNETCORE_ENVIRONMENT="Development"
 export DOTNET_ENVIRONMENT="Development"
 ```
+
+### Postman Collection
+
+Para testar a API, importe o arquivo `job.postman_collection.json` no Postman.
 
 ### Ferramentas necessárias
 
@@ -48,6 +57,7 @@ Para autenticar como motoboy e necessário fazer o cadastro e utilizar o CNPJ no
 - .NET 8
 - Banco de dados PostgreSQL
 - CQS (Command Query Separation)
+- MediatR para implementação do padrão CQS.
 - ORM: **EntityFramework Core**
 - Framework de Testes: **XUnit**
 - Framework de Assertions: **FluentAssertions**
@@ -58,3 +68,7 @@ Para autenticar como motoboy e necessário fazer o cadastro e utilizar o CNPJ no
 - Tratamento de Warning como Erro.
 - Dockerfile para a aplicação e para o banco de dados.
 - Docker Compose para subir a aplicação e o banco de dados.
+- [BCrypt.NET - NEXT](https://github.com/BcryptNet/bcrypt.net) para criptografia de senha.
+- Swagger para documentação da API.
+- [Fluent Result](https://github.com/altmann/FluentResults) para padronização de retorno da API.
+- Postman Collection para testes de API.

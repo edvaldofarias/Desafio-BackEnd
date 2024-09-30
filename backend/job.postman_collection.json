@@ -1,0 +1,491 @@
+{
+	"info": {
+		"_postman_id": "702fbc4b-6b0f-4071-a8fe-a87749dfc28c",
+		"name": "Mottu",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "4327927"
+	},
+	"item": [
+		{
+			"name": "Manager",
+			"item": [
+				{
+					"name": "Authentication",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"var bearerToken is undefined\", function() {\r",
+									"    pm.environment.unset(\"token\");\r",
+									"});\r",
+									"\r",
+									"pm.test(\"var bearerToken is setted\", function() {\r",
+									"    let jsonData = pm.response.json();\r",
+									"    pm.environment.set(\"token\", jsonData.token);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"email\": \"job@job.com\",\r\n  \"password\": \"mudar@123\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/manager/authentication",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"manager",
+								"authentication"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Moto",
+			"item": [
+				{
+					"name": "GetAll",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/moto/GetAll",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"moto",
+								"GetAll"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetById",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": []
+						},
+						"url": {
+							"raw": "{{url}}/Moto/GetById?Id=048eaf02-357a-4561-9122-9393bcab998d",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"Moto",
+								"GetById"
+							],
+							"query": [
+								{
+									"key": "Id",
+									"value": "048eaf02-357a-4561-9122-9393bcab998d"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetByPlate",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "accept",
+								"value": "*/*"
+							},
+							{
+								"key": "Authorization",
+								"value": "bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6ImpvYkBqb2IuY29tIiwicm9sZSI6ImFkbWluIiwibmJmIjoxNzI3NTUxNTAyLCJleHAiOjE3Mjc1ODAzMDIsImlhdCI6MTcyNzU1MTUwMn0.ZMDfpj3hDleBVRdgUxEzZm8xd-0U0pzrSmuP8WvuGmQ"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:5041/Moto/GetByPlate?plate=ABC1234",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5041",
+							"path": [
+								"Moto",
+								"GetByPlate"
+							],
+							"query": [
+								{
+									"key": "plate",
+									"value": "ABC1234"
+								}
+							]
+						},
+						"description": "Generated from cURL: curl -X 'GET' \\\r\n  'http://localhost:5041/Moto/GetByPlate?plate=ABC12344' \\\r\n  -H 'accept: */*' \\\r\n  -H 'Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6ImpvYkBqb2IuY29tIiwicm9sZSI6ImFkbWluIiwibmJmIjoxNzI3NTUxNTAyLCJleHAiOjE3Mjc1ODAzMDIsImlhdCI6MTcyNzU1MTUwMn0.ZMDfpj3hDleBVRdgUxEzZm8xd-0U0pzrSmuP8WvuGmQ'"
+					},
+					"response": []
+				},
+				{
+					"name": "Create",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"year\": 2024,\r\n  \"model\": \"NEO 125 UBS\",\r\n  \"plate\": \"ABC1234\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/Moto/Create",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"Moto",
+								"Create"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"id\": \"3fa85f64-5717-4562-b3fc-2c963f66afa6\",\r\n  \"year\": 2024,\r\n  \"model\": \"FACTOR 125I UBS\",\r\n  \"plate\": \"ABC1234\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/Moto/Update",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"Moto",
+								"Update"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/Moto/Delete?Id=39d3694f-0ab0-4b24-acd8-4fc60731f713",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"Moto",
+								"Delete"
+							],
+							"query": [
+								{
+									"key": "Id",
+									"value": "39d3694f-0ab0-4b24-acd8-4fc60731f713"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "MotoBoy",
+			"item": [
+				{
+					"name": "Create",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"name\": \"Ronaldo Nazário\",\r\n  \"password\": \"9bdp5ZuAYt3Yholbfi\",\r\n  \"cnpj\": \"48.907.348/0001-93\",\r\n  \"dateBirth\": \"1990-08-08\",\r\n  \"cnh\": \"92773614628\",\r\n  \"typeCnh\": 1\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/Motoboy/Create",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"Motoboy",
+								"Create"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Authentication",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"var bearerToken is undefined\", function() {\r",
+									"    pm.environment.unset(\"token\");\r",
+									"});\r",
+									"\r",
+									"pm.test(\"var bearerToken is setted\", function() {\r",
+									"    let jsonData = pm.response.json();\r",
+									"    pm.environment.set(\"token\", jsonData.token);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"cnpj\": \"48.907.348/0001-93\",\r\n  \"password\": \"9bdp5ZuAYt3Yholbfi\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/Motoboy/Authentication",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"Motoboy",
+								"Authentication"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Rental",
+			"item": [
+				{
+					"name": "Create",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"idMoto\": \"3fa85f64-5717-4562-b3fc-2c963f66afa6\",\r\n  \"datePreview\": \"2024-09-28T19:44:01.801Z\",\r\n  \"plan\": 7\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/Rental/Create",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"Rental",
+								"Create"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "New Request",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"id\": \"3fa85f64-5717-4562-b3fc-2c963f66afa6\",\r\n  \"datePreview\": \"2024-09-28T19:45:10.803Z\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/Rental/Cancel",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"Rental",
+								"Cancel"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"value": "",
+			"type": "string",
+			"disabled": true
+		}
+	]
+}
