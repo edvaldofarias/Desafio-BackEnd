@@ -4,7 +4,6 @@ using Job.Application.Repositories;
 using Job.Application.Services;
 using Job.Commons.Application.Commands.Manager;
 using Job.Commons.Domain.Entities.User;
-using Job.Domain.Commons;
 using Job.Domain.Entities.User;
 
 namespace Job.UnitTests.Application.Services;
@@ -17,6 +16,7 @@ public class ManagerServiceTest
     private readonly IValidator<AuthenticationManagerCommand> _validator = new AuthenticationManagerValidation();
     private readonly ManagerService _managerService;
     private readonly CancellationToken _cancellationToken = CancellationToken.None;
+    private const int WorkFactor = 12;
 
     public ManagerServiceTest()
     {
@@ -31,7 +31,8 @@ public class ManagerServiceTest
         // Arrange
         var command = AuthenticationManagerCommandFaker.Default().Generate();
         var manager = ManagerEntityFaker.Default().Generate();
-        _managerRepository.Setup(x => x.GetAsync(command.Email, Cryptography.Encrypt(command.Password), _cancellationToken))
+        var password = BCrypt.Net.BCrypt.HashPassword(command.Password, WorkFactor);
+        _managerRepository.Setup(x => x.GetAsync(command.Email, password, _cancellationToken))
             .ReturnsAsync(manager);
 
         // Act
@@ -39,7 +40,7 @@ public class ManagerServiceTest
 
         // Assert
         response.Should().BeSuccess();
-        _managerRepository.Verify(x => x.GetAsync(command.Email, Cryptography.Encrypt(command.Password), _cancellationToken), Times.Once);
+        _managerRepository.Verify(x => x.GetAsync(command.Email, password, _cancellationToken), Times.Once);
     }
 
     [Fact]

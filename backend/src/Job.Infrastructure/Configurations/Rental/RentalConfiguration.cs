@@ -8,6 +8,11 @@ public class RentalConfiguration : IEntityTypeConfiguration<RentalEntity>
 {
     public void Configure(EntityTypeBuilder<RentalEntity> builder)
     {
+        builder.ToTable("Rental");
 
+        builder.HasKey(x => x.Id);
+
+        builder.Property(x => x.Id)
+            .ValueGeneratedNever();
     }
 }

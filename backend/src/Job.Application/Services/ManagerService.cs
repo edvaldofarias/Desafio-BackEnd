@@ -10,6 +10,8 @@ public sealed class ManagerService(
     IValidator<AuthenticationManagerCommand> validator
 ) : IRequestHandler<AuthenticationManagerCommand, Result<ManagerDto>>
 {
+    private const int WorkFactor = 12;
+
     public async Task<Result<ManagerDto>> Handle(AuthenticationManagerCommand request,
         CancellationToken cancellationToken)
     {
@@ -22,7 +24,8 @@ public sealed class ManagerService(
             return Result.Fail(validationResult.Errors.Select(x => x.ErrorMessage));
         }
 
-        var manager = await managerRepository.GetAsync(request.Email, Cryptography.Encrypt(request.Password), cancellationToken);
+        var password = BCrypt.Net.BCrypt.HashPassword(request.Password, WorkFactor);
+        var manager = await managerRepository.GetAsync(request.Email, password, cancellationToken);
         if (manager is null)
         {
             logger.LogError("Manager not found");

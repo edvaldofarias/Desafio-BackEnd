@@ -56,6 +56,11 @@
         "resolved": "2.8.2",
         "contentHash": "vm1tbfXhFmjFMUmS4M0J0ASXz3/U5XvXBa6DOQUL3fEz4Vt6YPhv+ESCarx6M6D+9kJkJYZKCNvJMas1+nVfmQ=="
       },
+      "BCrypt.Net-Next": {
+        "type": "Transitive",
+        "resolved": "4.0.3",
+        "contentHash": "W+U9WvmZQgi5cX6FS5GDtDoPzUCV4LkBLkywq/kRZhuDwcbavOzcDAr3LXJFqHUi952Yj3LEYoWW0jbEUQChsA=="
+      },
       "CloudinaryDotNet": {
         "type": "Transitive",
         "resolved": "1.26.2",
@@ -798,6 +803,7 @@
       "job.application": {
         "type": "Project",
         "dependencies": {
+          "BCrypt.Net-Next": "[4.0.3, )",
           "CloudinaryDotNet": "[1.26.2, )",
           "FluentResults": "[3.16.0, )",
           "FluentValidation": "[11.10.0, )",

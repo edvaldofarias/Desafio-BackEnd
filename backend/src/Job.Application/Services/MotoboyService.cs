@@ -14,6 +14,8 @@ public sealed class MotoboyService(ILogger<MotoboyService> logger, IMotoboyRepos
     IRequestHandler<CreateMotoboyCommand, Result>,
     IRequestHandler<UploadCnhMotoboyCommand, Result>
 {
+    private const int WorkFactor = 12;
+
     public async Task<Result<MotoboyDto>> Handle(AuthenticationMotoboyCommand request,
         CancellationToken cancellationToken)
     {
@@ -24,7 +26,7 @@ public sealed class MotoboyService(ILogger<MotoboyService> logger, IMotoboyRepos
             return Result.Fail(validate.Errors.Select(x => x.ErrorMessage));
 
         var cnpj = CnpjValidation.FormatCnpj(request.Cnpj);
-        var password = Cryptography.Encrypt(request.Password);
+        var password = BCrypt.Net.BCrypt.HashPassword(request.Password, WorkFactor);
         var motoboy = await motoboyRepository.GetAsync(cnpj, password, cancellationToken);
 
         if (motoboy is null)
@@ -44,7 +46,8 @@ public sealed class MotoboyService(ILogger<MotoboyService> logger, IMotoboyRepos
         var validate = await new CreateMotoboyValidation().ValidateAsync(request, cancellationToken);
 
         logger.LogInformation("Criando objeto motoboy");
-        var motoboyEntity = new MotoboyEntity(request.Password, request.Name, request.Cnpj,
+        var password = BCrypt.Net.BCrypt.HashPassword(request.Password, WorkFactor);
+        var motoboyEntity = new MotoboyEntity(password, request.Name, request.Cnpj,
             DateOnly.FromDateTime(request.DateBirth), request.Cnh, request.TypeCnh);
 
         await CheckDocumentAsync(validate, motoboyEntity, cancellationToken);

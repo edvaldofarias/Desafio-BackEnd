@@ -1,14 +1,15 @@
 ﻿using Job.Domain.Entities.User;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Job.Infrastructure.Configurations.User;
+namespace Job.Infrastructure.Configurations.Manager;
 
 [ExcludeFromCodeCoverage]
 public class ManagerConfiguration : IEntityTypeConfiguration<ManagerEntity>
 {
+    private const int WorkFactor = 12;
     public void Configure(EntityTypeBuilder<ManagerEntity> builder)
     {
-        builder.ToTable("Managers");
+        builder.ToTable("Manager");
 
         builder.HasKey(x => x.Id);
 
@@ -26,6 +27,8 @@ public class ManagerConfiguration : IEntityTypeConfiguration<ManagerEntity>
         builder.HasIndex(x => x.Email)
             .IsUnique();
 
-        builder.HasData(new ManagerEntity("job@job.com", "mudar@123"));
+        var password = BCrypt.Net.BCrypt.HashPassword("mudar@123", WorkFactor);
+        const string email = "job@job.com";
+        builder.HasData(new ManagerEntity(email, password));
     }
 }

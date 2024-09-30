@@ -14,6 +14,7 @@ public class MotoboyServiceTest
     private readonly Mock<IMotoboyRepository> _managerRepository = new();
     private readonly MotoboyService _motoboyService;
     private readonly CancellationToken _cancellationToken = CancellationToken.None;
+    private const int WorkFactor = 12;
 
     public MotoboyServiceTest()
     {
@@ -29,7 +30,7 @@ public class MotoboyServiceTest
         var command = AuthenticationMotoboyCommandFaker.Default().Generate();
         var motoboy = MotoboyEntityFaker.Default().Generate();
         var cnpj = CnpjValidation.FormatCnpj(command.Cnpj);
-        var password = Cryptography.Encrypt(command.Password);
+        var password = BCrypt.Net.BCrypt.HashPassword(command.Password, WorkFactor);
         _managerRepository.Setup(x => x.GetAsync(cnpj, password, _cancellationToken))
             .ReturnsAsync(motoboy);
 
@@ -39,7 +40,7 @@ public class MotoboyServiceTest
         // Assert
         response.Should().BeSuccess();
         response.Value.Should().NotBeNull();
-        _managerRepository.Verify(x => x.GetAsync(It.IsAny<string>(), Cryptography.Encrypt(command.Password), _cancellationToken), Times.Once);
+        _managerRepository.Verify(x => x.GetAsync(It.IsAny<string>(), password, _cancellationToken), Times.Once);
     }
 
     [Fact]
@@ -49,6 +50,7 @@ public class MotoboyServiceTest
         var command = AuthenticationMotoboyCommandFaker.Default().Generate();
         _managerRepository.Setup(x => x.GetAsync(It.IsAny<string>(), command.Password, _cancellationToken))
             .ReturnsAsync((MotoboyEntity?)null);
+        var password = BCrypt.Net.BCrypt.HashPassword(command.Password, WorkFactor);
 
         // Act
         var response = await _motoboyService.Handle(command, CancellationToken.None);
@@ -56,7 +58,7 @@ public class MotoboyServiceTest
         // Assert
         response.Should().BeSuccess();
         response.Value.Should().BeNull();
-        _managerRepository.Verify(x => x.GetAsync(It.IsAny<string>(), Cryptography.Encrypt(command.Password), _cancellationToken), Times.Once);
+        _managerRepository.Verify(x => x.GetAsync(It.IsAny<string>(), password, _cancellationToken), Times.Once);
     }
 
     [Fact]
@@ -145,6 +147,4 @@ public class MotoboyServiceTest
     }
 
     #endregion
-
-
 }
