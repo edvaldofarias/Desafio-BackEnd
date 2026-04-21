@@ -14,12 +14,13 @@ public sealed class MotoServiceTest
     private readonly Mock<IMotoRepository> _motoRepository = new();
     private readonly Mock<ILogger<MotoService>> _logger = new();
     private readonly Mock<IRentalRepository> _rentRepository = new();
+    private readonly Mock<Job.Application.Messaging.IMessagePublisher> _publisher = new();
     private readonly MotoService _motoService;
     private readonly CancellationToken _cancellationToken = CancellationToken.None;
 
     public MotoServiceTest()
     {
-        _motoService = new MotoService(_logger.Object, _motoRepository.Object, _rentRepository.Object);
+        _motoService = new MotoService(_logger.Object, _motoRepository.Object, _rentRepository.Object, _publisher.Object);
     }
 
     #region CreateAsync
@@ -135,11 +136,10 @@ public sealed class MotoServiceTest
     {
         // Arrange
         var motoEntity = MotoEntityFaker.Default().Generate();
-        var rentEntity = RentalEntityFaker.Default().Generate();
         _motoRepository.Setup(x => x.GetByIdAsync(It.IsAny<Guid>(), _cancellationToken))
             .ReturnsAsync(motoEntity);
-        _rentRepository.Setup(x => x.GetByMotoIdAsync(It.IsAny<Guid>(), _cancellationToken))
-            .ReturnsAsync(rentEntity);
+        _rentRepository.Setup(x => x.ExistsForMotoAsync(It.IsAny<Guid>(), _cancellationToken))
+            .ReturnsAsync(true);
         var command = new DeleteMotoCommand(motoEntity.Id);
 
 

@@ -8,16 +8,6 @@ public sealed class UpdateMotoValidation : AbstractValidator<UpdateMotoCommand>
             .NotEmpty()
             .WithMessage("Id é obrigatório");
 
-        RuleFor(x => x.Year)
-            .NotEmpty()
-            .WithMessage("Ano é obrigatório")
-            .GreaterThan(1900)
-            .WithMessage("Ano deve ser maior que 1900");
-
-        RuleFor(x => x.Model)
-            .NotEmpty()
-            .WithMessage("Modelo é obrigatório");
-
         RuleFor(x => x.Plate)
             .NotEmpty()
             .WithMessage("Placa é obrigatória")

@@ -7,11 +7,9 @@ public sealed class MotoEntity(int year, string model, string plate) : BaseEntit
     public string Model { get; private set; } = model;
     public string Plate { get; private set; } = plate.Replace("-", string.Empty);
 
-    public void Update(int year, string model, string plate)
+    public void UpdatePlate(string plate)
     {
         base.Update();
-        Year = year;
-        Model = model;
         Plate = plate.Replace("-", string.Empty);
     }
 }

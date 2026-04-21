@@ -41,6 +41,9 @@ builder.Services.AddSwaggerGen(c =>
 var configuration = builder.Configuration;
 builder.Services.AddDependencyInject(configuration);
 
+var jwtSecret = configuration["Jwt:Secret"]
+    ?? throw new InvalidOperationException("Configuração 'Jwt:Secret' não definida.");
+
 builder.Services.AddAuthentication(x =>
 {
     x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -51,7 +54,7 @@ builder.Services.AddAuthentication(x =>
     {
         ValidateIssuerSigningKey = true,
         ValidateAudience = false,
-        IssuerSigningKey = new SymmetricSecurityKey("b2e523160e5740e49ec7885759dbb657"u8.ToArray()),
+        IssuerSigningKey = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(jwtSecret)),
         ValidateIssuer = false
     };
 });

@@ -1,4 +1,5 @@
 ﻿using Job.Domain.Entities.Moto;
+using Job.Domain.Entities.Notification;
 using Job.Domain.Entities.Rental;
 using Job.Domain.Entities.User;
 using Job.Infrastructure.Conversions;
@@ -32,4 +33,5 @@ public sealed class JobContext : DbContext
     public DbSet<MotoboyEntity> Motoboys => Set<MotoboyEntity>();
     public DbSet<MotoEntity> Motos => Set<MotoEntity>();
     public DbSet<ManagerEntity> Managers => Set<ManagerEntity>();
+    public DbSet<MotoNotificationEntity> MotoNotifications => Set<MotoNotificationEntity>();
 }

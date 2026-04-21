@@ -12,15 +12,15 @@
         <PackageReference Include="FluentResults.Extensions.AspNetCore" Version="0.1.0" />
         <PackageReference Include="FluentValidation.AspNetCore" Version="11.3.0" />
         <PackageReference Include="MediatR" Version="12.4.1" />
-        <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.7" />
-        <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.7" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.7">
+        <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.11" />
+        <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.11" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.11">
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
           <PrivateAssets>all</PrivateAssets>
         </PackageReference>
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="8.0.7" />
-        <PackageReference Include="Swashbuckle.AspNetCore" Version="6.7.0" />
-        <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.0.1" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="8.0.11" />
+        <PackageReference Include="Swashbuckle.AspNetCore" Version="6.8.1" />
+        <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.3.0" />
     </ItemGroup>
 
     <ItemGroup>

@@ -10,5 +10,7 @@ public interface IRentalRepository
 
     Task<RentalEntity?> GetByMotoIdAsync(Guid id, CancellationToken cancellationToken);
 
+    Task<bool> ExistsForMotoAsync(Guid motoId, CancellationToken cancellationToken);
+
     Task UpdateAsync(RentalEntity rental, CancellationToken cancellationToken);
 }

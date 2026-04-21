@@ -86,9 +86,12 @@ public sealed class RentalService(
             validate.Errors.Add(new ValidationFailure("IdMotoboy", "Motoboy não encontrado"));
         }
 
-        if (motoboy?.Type != ECnhType.B) return motoboy;
-        logger.LogInformation("Moto boy não possuir CNH Tipo A");
-        validate.Errors.Add(new ValidationFailure("TypeCnh", "Tipo de CNH não compatível"));
+        if (motoboy is null) return motoboy;
+
+        if (motoboy.Type is ECnhType.A or ECnhType.AB) return motoboy;
+
+        logger.LogInformation("Motoboy não possui CNH categoria A");
+        validate.Errors.Add(new ValidationFailure("TypeCnh", "Somente entregadores habilitados na categoria A podem efetuar uma locação"));
 
         return motoboy;
     }

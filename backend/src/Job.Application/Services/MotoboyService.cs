@@ -1,6 +1,4 @@
-﻿using CloudinaryDotNet;
-using CloudinaryDotNet.Actions;
-using FluentValidation.Results;
+﻿using FluentValidation.Results;
 using Job.Application.Commands.Motoboy;
 using Job.Application.Commands.Motoboy.Validations;
 using Job.Application.Dtos.Motoboy;
@@ -9,7 +7,10 @@ using Job.Domain.Entities.User;
 
 namespace Job.Application.Services;
 
-public sealed class MotoboyService(ILogger<MotoboyService> logger, IMotoboyRepository motoboyRepository) :
+public sealed class MotoboyService(
+    ILogger<MotoboyService> logger,
+    IMotoboyRepository motoboyRepository,
+    IFileStorageService fileStorageService) :
     IRequestHandler<AuthenticationMotoboyCommand, Result<MotoboyDto>>,
     IRequestHandler<CreateMotoboyCommand, Result>,
     IRequestHandler<UploadCnhMotoboyCommand, Result>
@@ -89,11 +90,14 @@ public sealed class MotoboyService(ILogger<MotoboyService> logger, IMotoboyRepos
         }
 
         var stream = request.FileDetails.OpenReadStream();
-        var path = await UploadImage(request.FileDetails.FileName, stream, cancellationToken);
-
-        if (path is null)
+        string path;
+        try
         {
-            logger.LogError("Erro ao realizar upload de imagem");
+            path = await fileStorageService.SaveAsync(request.FileDetails.FileName, stream, cancellationToken);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Erro ao realizar upload de imagem");
             validationFailures.Add(new ValidationFailure("File", "Erro ao realizar upload de imagem"));
             return Result.Fail(validationFailures.Select(x => x.ErrorMessage));
         }
@@ -119,21 +123,5 @@ public sealed class MotoboyService(ILogger<MotoboyService> logger, IMotoboyRepos
             logger.LogInformation("CNH já cadastrada {cnh}", motoboyEntity.Cnh);
             validate.Errors.Add(new ValidationFailure("Cnh", "CNH já cadastrada"));
         }
-    }
-
-    private static async Task<string?> UploadImage(string fileName, Stream stream, CancellationToken cancellationToken)
-    {
-        const string cloud = "cloud";
-        const string apiKey = "";
-        const string apiSecret = "";
-        var account = new Account(cloud, apiKey, apiSecret);
-
-        var cloudinary = new Cloudinary(account);
-        var uploadParams = new ImageUploadParams
-        {
-            File = new FileDescription(fileName, stream)
-        };
-        var result = await cloudinary.UploadAsync(uploadParams, cancellationToken);
-        return result?.SecureUrl.AbsoluteUri;
     }
 }

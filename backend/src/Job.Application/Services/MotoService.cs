@@ -2,6 +2,7 @@
 using Job.Application.Commands.Moto;
 using Job.Application.Commands.Moto.Validations;
 using Job.Application.Dtos.Moto;
+using Job.Application.Messaging;
 using Job.Application.Repositories;
 using Job.Domain.Entities.Moto;
 
@@ -10,7 +11,8 @@ namespace Job.Application.Services;
 public sealed class MotoService(
     ILogger<MotoService> logger,
     IMotoRepository motoRepository,
-    IRentalRepository rentalRepository) :
+    IRentalRepository rentalRepository,
+    IMessagePublisher messagePublisher) :
     IRequestHandler<CreateMotoCommand, Result<Guid>>,
     IRequestHandler<UpdateMotoCommand, Result>,
     IRequestHandler<GetByIdMotoCommand, Result<MotoDto>>,
@@ -35,6 +37,10 @@ public sealed class MotoService(
         {
             logger.LogInformation("Moto criada com sucesso");
             await motoRepository.CreateAsync(moto, cancellationToken);
+
+            var @event = new MotoCreatedEvent(moto.Id, moto.Year, moto.Model, moto.Plate, DateTime.UtcNow);
+            await messagePublisher.PublishMotoCreatedAsync(@event, cancellationToken);
+
             return Result.Ok(moto.Id);
         }
 
@@ -56,7 +62,7 @@ public sealed class MotoService(
 
         if (validator.IsValid)
         {
-            moto!.Update(request.Year, request.Model, request.Plate);
+            moto!.UpdatePlate(request.Plate);
             logger.LogInformation("Moto atualizada com sucesso");
             await motoRepository.UpdateAsync(moto, cancellationToken);
             return Result.Ok();
@@ -115,12 +121,10 @@ public sealed class MotoService(
             return Result.Fail("Moto não encontrada");
         }
 
-        var rent = await rentalRepository.GetByMotoIdAsync(moto.Id, cancellationToken);
-
-        if(rent is not null && rent.DateEnd > DateOnly.FromDateTime(DateTime.Now))
+        if (await rentalRepository.ExistsForMotoAsync(moto.Id, cancellationToken))
         {
-            logger.LogInformation("Moto com aluguel ativo");
-            return Result.Fail("Moto com aluguel ativo");
+            logger.LogInformation("Moto possui registro de locações");
+            return Result.Fail("Moto possui registro de locações e não pode ser removida");
         }
 
         logger.LogInformation("Moto excluída com sucesso");

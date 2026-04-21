@@ -13,13 +13,14 @@ public class MotoboyServiceTest
 {
     private readonly Mock<ILogger<MotoboyService>> _logger = new();
     private readonly Mock<IMotoboyRepository> _managerRepository = new();
+    private readonly Mock<IFileStorageService> _fileStorage = new();
     private readonly MotoboyService _motoboyService;
     private readonly CancellationToken _cancellationToken = CancellationToken.None;
     private const int WorkFactor = 12;
 
     public MotoboyServiceTest()
     {
-        _motoboyService = new MotoboyService(_logger.Object, _managerRepository.Object);
+        _motoboyService = new MotoboyService(_logger.Object, _managerRepository.Object, _fileStorage.Object);
     }
 
     #region GetMotoboy

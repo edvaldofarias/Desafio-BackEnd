@@ -14,5 +14,19 @@ public class MotoConfiguration : IEntityTypeConfiguration<MotoEntity>
 
         builder.Property(x => x.Id)
             .ValueGeneratedNever();
+
+        builder.Property(x => x.Year)
+            .IsRequired();
+
+        builder.Property(x => x.Model)
+            .IsRequired()
+            .HasMaxLength(100);
+
+        builder.Property(x => x.Plate)
+            .IsRequired()
+            .HasMaxLength(10);
+
+        builder.HasIndex(x => x.Plate)
+            .IsUnique();
     }
 }

@@ -20,6 +20,11 @@ public class RentalRepository(JobContext context) : IRentalRepository
         return await context.Rents.Where(x => x.IdMoto == id).FirstOrDefaultAsync(cancellationToken);
     }
 
+    public Task<bool> ExistsForMotoAsync(Guid motoId, CancellationToken cancellationToken)
+    {
+        return context.Rents.AnyAsync(x => x.IdMoto == motoId, cancellationToken);
+    }
+
     public async Task UpdateAsync(RentalEntity rental, CancellationToken cancellationToken)
     {
         context.Rents.Update(rental);
