@@ -1,96 +1,58 @@
-﻿using FluentResults.Extensions.AspNetCore;
-using Job.Application.Commands.Moto;
+﻿using Job.Application.Commands.Moto;
+using Job.WebApi.Infrastructure;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Job.WebApi.Controllers;
 
-public class MotoController(
-    ILogger<MotoController> logger,
-    IMediator mediator) : BaseController
+[Route("motos")]
+[AllowAnonymous]
+public sealed class MotoController(IMediator mediator) : BaseController
 {
-    [HttpGet]
-    [Authorize(Roles = "admin,motoboy")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(StatusCodes.Status403Forbidden)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> GetAll(CancellationToken cancellationToken)
-    {
-        logger.LogInformation("Recuperando todos as motos cadastradas");
-        var result = await mediator.Send(new GetAllMotoCommand(), cancellationToken);
-        return result.ToActionResult();
-    }
-
-    [HttpGet]
-    [Authorize(Roles = "admin,motoboy")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(StatusCodes.Status403Forbidden)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> GetById([FromQuery] Guid id, CancellationToken cancellationToken)
-    {
-        logger.LogInformation("Recuperando moto por id {id}", id);
-        var result = await mediator.Send(new GetByIdMotoCommand(id), cancellationToken);
-        return result.ValueOrDefault is null ? NotFound() : result.ToActionResult();
-    }
-
-    [HttpGet]
-    [Authorize(Roles = "admin,motoboy")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(StatusCodes.Status403Forbidden)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> GetByPlate([FromQuery] string plate, CancellationToken cancellationToken)
-    {
-        logger.LogInformation("Recuperando moto por placa {plate}", plate);
-        var result = await mediator.Send(new GetByPlateMotoCommand(plate), cancellationToken);
-        return result.ValueOrDefault is null ? NotFound() : result.ToActionResult();
-    }
-
     [HttpPost]
-    [Authorize(Roles = "admin")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(StatusCodes.Status403Forbidden)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Create([FromBody] CreateMotoCommand command, CancellationToken cancellationToken)
     {
-        logger.LogInformation("Criando moto");
-        var response = await mediator.Send(command, cancellationToken);
-        return response.ToActionResult();
+        var result = await mediator.Send(command, cancellationToken);
+        return result.ToCreatedMensagemActionResult();
     }
 
-    [HttpPut]
-    [Authorize(Roles = "admin")]
+    [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(StatusCodes.Status403Forbidden)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Update([FromBody] UpdateMotoCommand command, CancellationToken cancellationToken)
+    public async Task<IActionResult> GetAll([FromQuery(Name = "placa")] string? placa, CancellationToken cancellationToken)
     {
-        logger.LogInformation("Atualizando moto");
-        var response = await mediator.Send(command, cancellationToken);
-        return response.ToActionResult();
+        var result = await mediator.Send(new GetAllMotoCommand(placa), cancellationToken);
+        return result.ToMensagemActionResult();
     }
 
-    [HttpDelete]
-    [Authorize(Roles = "admin")]
+    [HttpGet("{id}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetById([FromRoute] string id, CancellationToken cancellationToken)
+    {
+        var result = await mediator.Send(new GetByIdMotoCommand(id), cancellationToken);
+        return result.ToMensagemActionResult();
+    }
+
+    [HttpPut("{id}/placa")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(StatusCodes.Status403Forbidden)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Delete([FromQuery] Guid id, CancellationToken cancellationToken)
+    public async Task<IActionResult> UpdatePlate([FromRoute] string id, [FromBody] UpdatePlateRequest body, CancellationToken cancellationToken)
     {
-        logger.LogInformation("Deletando moto");
-        var response = await mediator.Send(new DeleteMotoCommand(id), cancellationToken);
-        return response.ToActionResult();
+        var result = await mediator.Send(new UpdateMotoCommand(id, body.Placa), cancellationToken);
+        return result.ToMensagemActionResult(successMessage: "Placa modificada com sucesso");
     }
+
+    [HttpDelete("{id}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> Delete([FromRoute] string id, CancellationToken cancellationToken)
+    {
+        var result = await mediator.Send(new DeleteMotoCommand(id), cancellationToken);
+        return result.ToMensagemActionResult();
+    }
+
+    public sealed record UpdatePlateRequest(string Placa);
 }

@@ -4,9 +4,9 @@ public sealed class UpdateMotoValidation : AbstractValidator<UpdateMotoCommand>
 {
     public UpdateMotoValidation()
     {
-        RuleFor(x => x.Id)
+        RuleFor(x => x.Identifier)
             .NotEmpty()
-            .WithMessage("Id é obrigatório");
+            .WithMessage("Identificador é obrigatório");
 
         RuleFor(x => x.Plate)
             .NotEmpty()

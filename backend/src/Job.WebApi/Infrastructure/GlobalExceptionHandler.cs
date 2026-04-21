@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Diagnostics;
-using Microsoft.AspNetCore.Mvc;
 
 namespace Job.WebApi.Infrastructure;
 
@@ -10,21 +9,13 @@ internal sealed class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> log
         Exception exception,
         CancellationToken cancellationToken)
     {
-        logger.LogError("Error Message: {exceptionMessage}, Occurred at:{time}", exception.Message, DateTime.UtcNow);
+        logger.LogError(exception, "Error Message: {exceptionMessage}, Occurred at:{time}", exception.Message, DateTime.UtcNow);
 
         var statusCode = GetStatusCode(exception);
 
-        var problemDetails = new ProblemDetails
-        {
-            Title = "An error occurred",
-            Status = statusCode,
-            Detail = exception.Message,
-            Instance = httpContext.Request.Path
-        };
-
         httpContext.Response.StatusCode = statusCode;
-        httpContext.Response.ContentType = "application/problem+json";
-        await httpContext.Response.WriteAsJsonAsync(problemDetails, cancellationToken);
+        httpContext.Response.ContentType = "application/json";
+        await httpContext.Response.WriteAsJsonAsync(new { mensagem = exception.Message }, cancellationToken);
         return true;
     }
 

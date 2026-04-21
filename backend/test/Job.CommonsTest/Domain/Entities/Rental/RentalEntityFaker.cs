@@ -9,22 +9,19 @@ public static class RentalEntityFaker
     public static Faker<RentalEntity> Default()
     {
         return new Faker<RentalEntity>()
-            .CustomInstantiator(faker => new RentalEntity(
-                faker.Random.Guid(),
-                faker.Random.Guid(),
-                faker.Date.FutureDateOnly(),
-                faker.PickRandom<EPlan>()
-            ));
-    }
-
-    public static Faker<RentalEntity> Invalid()
-    {
-        return new Faker<RentalEntity>()
-            .CustomInstantiator(faker => new RentalEntity(
-                Guid.Empty,
-                Guid.Empty,
-                faker.Date.PastDateOnly(),
-                faker.PickRandom<EPlan>()
-            ));
+            .CustomInstantiator(faker =>
+            {
+                var start = faker.Date.FutureDateOnly();
+                var preview = start.AddDays(7);
+                var end = preview.AddDays(1);
+                return new RentalEntity(
+                    faker.Random.AlphaNumeric(8),
+                    faker.Random.Guid(),
+                    faker.Random.Guid(),
+                    start,
+                    end,
+                    preview,
+                    EPlan.Sete);
+            });
     }
 }

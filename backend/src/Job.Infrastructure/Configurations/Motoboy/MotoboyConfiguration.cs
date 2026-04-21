@@ -15,6 +15,10 @@ public class MotoboyConfiguration : IEntityTypeConfiguration<MotoboyEntity>
         builder.Property(x => x.Id)
             .ValueGeneratedNever();
 
+        builder.Property(x => x.Identifier)
+            .IsRequired()
+            .HasMaxLength(100);
+
         builder.Property(x => x.Name)
             .IsRequired()
             .HasMaxLength(150);
@@ -32,6 +36,9 @@ public class MotoboyConfiguration : IEntityTypeConfiguration<MotoboyEntity>
 
         builder.Property(x => x.CnhImage)
             .HasMaxLength(500);
+
+        builder.HasIndex(x => x.Identifier)
+            .IsUnique();
 
         builder.HasIndex(x => x.Cnpj)
             .IsUnique();

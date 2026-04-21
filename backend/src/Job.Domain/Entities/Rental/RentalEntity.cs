@@ -4,59 +4,94 @@ namespace Job.Domain.Entities.Rental;
 
 public sealed class RentalEntity : BaseEntity
 {
-    public RentalEntity(Guid idMotoboy, Guid idMoto, DateOnly datePreview, EPlan plan)
+    private RentalEntity()
     {
-        DateStart = DateOnly.FromDateTime(DateTime.Now.AddDays(1));
-        IdMotoboy = idMotoboy;
-        IdMoto = idMoto;
-        DatePreview = datePreview;
-        Plan = plan;
-        DateEnd = DateStart.AddDays((int) plan);
-        CalculateRental();
     }
 
+    public RentalEntity(
+        string identifier,
+        Guid idMotoboy,
+        Guid idMoto,
+        DateOnly dateStart,
+        DateOnly dateEnd,
+        DateOnly datePreview,
+        EPlan plan)
+    {
+        Identifier = identifier;
+        IdMotoboy = idMotoboy;
+        IdMoto = idMoto;
+        DateStart = dateStart;
+        DateEnd = dateEnd;
+        DatePreview = datePreview;
+        Plan = plan;
+        DailyValue = ResolveDailyValue(plan);
+        Value = DailyValue * (int)plan;
+    }
+
+    public string Identifier { get; private set; } = string.Empty;
     public DateOnly DateStart { get; private set; }
     public DateOnly DateEnd { get; private set; }
     public DateOnly DatePreview { get; private set; }
+    public DateOnly? DateReturn { get; private set; }
     public Guid IdMoto { get; private set; }
     public Guid IdMotoboy { get; private set; }
     public EPlan Plan { get; private set; }
     public decimal Value { get; private set; }
+    public decimal DailyValue { get; private set; }
     public decimal? Fine { get; private set; }
 
-    private void CalculateRental()
+    public decimal RegisterReturn(DateOnly dateReturn)
     {
-        Value = Plan switch
-        {
-            EPlan.Sete => 7 * 30,
-            EPlan.Quinze => 15 * 28,
-            EPlan.Trinta => 30 * 22,
-            EPlan.QuarentaCinco => 45 * 20,
-            EPlan.Cinquenta => 50 * 18,
-            _ => 0
-        };
+        Update();
+        DateReturn = dateReturn;
+        Fine = CalculateFine(dateReturn);
+        Value = ComputeFinalValue(dateReturn);
+        return Value;
     }
 
-    public decimal CalculateFine(DateOnly datePreview)
+    private decimal ComputeFinalValue(DateOnly dateReturn)
     {
-        base.Update();
-        DatePreview = datePreview;
-        var days = DateEnd.DayNumber - DatePreview.DayNumber;
-
-        if (DateEnd < DatePreview)
+        if (dateReturn < DateEnd)
         {
-            Fine = 50 * days * -1;
-            return Fine ?? 0;
+            var daysUsed = dateReturn.DayNumber - DateStart.DayNumber;
+            if (daysUsed < 0) daysUsed = 0;
+            return DailyValue * daysUsed + (Fine ?? 0);
         }
 
-        if (days <= 0) return 0;
-
-        Fine = Plan switch
+        if (dateReturn > DateEnd)
         {
-            EPlan.Sete => Value / (int) Plan * 0.2m * days,
-            _ => Value / (int) Plan * 0.4m * days,
-        };
+            return DailyValue * (int)Plan + (Fine ?? 0);
+        }
 
-        return Fine ?? 0;
+        return DailyValue * (int)Plan;
     }
+
+    private decimal CalculateFine(DateOnly dateReturn)
+    {
+        if (dateReturn < DateEnd)
+        {
+            var unusedDays = DateEnd.DayNumber - dateReturn.DayNumber;
+            var unusedAmount = DailyValue * unusedDays;
+            var penaltyRate = Plan == EPlan.Sete ? 0.20m : 0.40m;
+            return Math.Round(unusedAmount * penaltyRate, 2);
+        }
+
+        if (dateReturn > DateEnd)
+        {
+            var lateDays = dateReturn.DayNumber - DateEnd.DayNumber;
+            return 50m * lateDays;
+        }
+
+        return 0m;
+    }
+
+    private static decimal ResolveDailyValue(EPlan plan) => plan switch
+    {
+        EPlan.Sete => 30m,
+        EPlan.Quinze => 28m,
+        EPlan.Trinta => 22m,
+        EPlan.QuarentaCinco => 20m,
+        EPlan.Cinquenta => 18m,
+        _ => 0m,
+    };
 }

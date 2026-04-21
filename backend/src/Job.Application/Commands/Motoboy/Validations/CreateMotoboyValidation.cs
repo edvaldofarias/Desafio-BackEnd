@@ -4,15 +4,13 @@ public sealed class CreateMotoboyValidation : AbstractValidator<CreateMotoboyCom
 {
     public CreateMotoboyValidation()
     {
+        RuleFor(x => x.Identifier)
+            .NotEmpty()
+            .WithMessage("Identificador é obrigatório");
+
         RuleFor(x => x.Name)
             .NotEmpty()
             .WithMessage("Nome é obrigatório");
-
-        RuleFor(x => x.Password)
-            .NotEmpty()
-            .WithMessage("Senha é obrigatória")
-            .MinimumLength(6)
-            .WithMessage("Senha deve ter no mínimo 6 caracteres");
 
         RuleFor(x => x.Cnpj)
             .NotEmpty()
@@ -34,6 +32,8 @@ public sealed class CreateMotoboyValidation : AbstractValidator<CreateMotoboyCom
 
         RuleFor(x => x.TypeCnh)
             .NotEmpty()
-            .WithMessage("Tipo de cnh é obrigatório");
+            .WithMessage("Tipo de cnh é obrigatório")
+            .Must(value => value == "A" || value == "B" || value == "A+B" || value == "AB")
+            .WithMessage("Tipo de cnh inválido");
     }
 }

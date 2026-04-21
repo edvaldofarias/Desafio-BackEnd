@@ -1,7 +1,11 @@
 using Job.Infrastructure.Context;
+using Job.Infrastructure.Storage;
 using Job.WebApi.Infrastructure;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.FileProviders;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 
@@ -76,6 +80,17 @@ if (app.Environment.IsDevelopment())
 app.UseExceptionHandler();
 app.UseHttpsRedirection();
 app.UseStaticFiles();
+
+var storageOptions = app.Services.GetRequiredService<IOptions<LocalFileStorageOptions>>().Value;
+var uploadsRoot = Path.IsPathRooted(storageOptions.RootPath)
+    ? storageOptions.RootPath
+    : Path.Combine(AppContext.BaseDirectory, storageOptions.RootPath);
+Directory.CreateDirectory(uploadsRoot);
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(uploadsRoot),
+    RequestPath = storageOptions.PublicBaseUrl.StartsWith('/') ? storageOptions.PublicBaseUrl : "/" + storageOptions.PublicBaseUrl,
+});
 
 app.UseAuthentication();
 app.UseAuthorization();

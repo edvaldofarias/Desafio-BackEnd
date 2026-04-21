@@ -1,5 +1,4 @@
 ﻿using Bogus;
-using Bogus.Extensions.Brazil;
 using Job.Application.Commands.Rental;
 using Job.Domain.Enums;
 
@@ -10,13 +9,19 @@ public static class CreateRentCommandFaker
     public static Faker<CreateRentalCommand> Default()
     {
         return new Faker<CreateRentalCommand>()
-            .CustomInstantiator(faker => new CreateRentalCommand(
-                faker.Random.Guid(),
-                faker.Date.Future(),
-                faker.PickRandom<EPlan>()
-            )
+            .CustomInstantiator(faker =>
             {
-                Cnpj = faker.Company.Cnpj()
+                var start = faker.Date.Future();
+                var preview = start.AddDays(7);
+                var end = preview.AddDays(1);
+                return new CreateRentalCommand(
+                    Identifier: faker.Random.AlphaNumeric(8),
+                    MotoboyIdentifier: faker.Random.AlphaNumeric(8),
+                    MotoIdentifier: faker.Random.AlphaNumeric(8),
+                    DateStart: start,
+                    DateEnd: end,
+                    DatePreview: preview,
+                    Plan: EPlan.Sete);
             });
     }
 
@@ -24,19 +29,25 @@ public static class CreateRentCommandFaker
     {
         return new Faker<CreateRentalCommand>()
             .CustomInstantiator(_ => new CreateRentalCommand(
-                Guid.Empty,
-                DateTime.MinValue,
-                0
-            ));
+                Identifier: string.Empty,
+                MotoboyIdentifier: string.Empty,
+                MotoIdentifier: string.Empty,
+                DateStart: DateTime.MinValue,
+                DateEnd: DateTime.MinValue,
+                DatePreview: DateTime.MinValue,
+                Plan: 0));
     }
 
     public static Faker<CreateRentalCommand> Invalid()
     {
         return new Faker<CreateRentalCommand>()
             .CustomInstantiator(faker => new CreateRentalCommand(
-                Guid.Empty,
-                faker.Date.Past(),
-                0
-            ));
+                Identifier: string.Empty,
+                MotoboyIdentifier: string.Empty,
+                MotoIdentifier: string.Empty,
+                DateStart: faker.Date.Past(),
+                DateEnd: faker.Date.Past(),
+                DatePreview: faker.Date.Past(),
+                Plan: 0));
     }
 }

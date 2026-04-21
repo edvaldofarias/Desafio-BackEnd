@@ -1,4 +1,5 @@
-﻿using Job.Application.Commands.Rental.Validations;
+﻿using FluentValidation.TestHelper;
+using Job.Application.Commands.Rental.Validations;
 using Job.Commons.Domain.Commands.Rent;
 
 namespace Job.UnitTests.Application.Commands.Rental;
@@ -9,32 +10,20 @@ public class CancelRentalValidationTest
     private readonly CancelRentalValidation _validator = new();
 
     [Fact]
-    public void ShouldReturnErrorWhenIdRentIsEmpty()
+    public void ShouldReturnErrorWhenEmpty()
     {
-        // Arrange
         var command = CancelRentCommandFaker.Empty().Generate();
-
-        // Act
         var result = _validator.TestValidate(command);
-
-        // Assert
-        result.ShouldHaveValidationErrorFor(x => x.Id);
-        result.ShouldHaveValidationErrorFor(x => x.DatePreview);
+        result.ShouldHaveValidationErrorFor(x => x.Identifier);
+        result.ShouldHaveValidationErrorFor(x => x.DateReturn);
     }
 
     [Fact]
-    public void ShouldNotReturnErrorWhenCommandIsValid()
+    public void ShouldNotReturnErrorWhenValid()
     {
-        // Arrange
         var command = CancelRentCommandFaker.Default().Generate();
-
-        // Act
         var result = _validator.TestValidate(command);
-
-        // Assert
-        result.ShouldNotHaveValidationErrorFor(x => x.Id);
-        result.ShouldNotHaveValidationErrorFor(x => x.DatePreview);
+        result.ShouldNotHaveValidationErrorFor(x => x.Identifier);
+        result.ShouldNotHaveValidationErrorFor(x => x.DateReturn);
     }
-
-
 }

@@ -1,10 +1,12 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using System.Text.Json.Serialization;
 
 namespace Job.Application.Commands.Motoboy;
 
 public sealed record UploadCnhMotoboyCommand : IRequest<Result>
 {
-    public IFormFile FileDetails { get; init; } = default!;
+    [JsonIgnore]
+    public string Identifier { get; set; } = string.Empty;
 
-    public string Cnpj { get; set; } = default!;
+    [JsonPropertyName("imagem_cnh")]
+    public string CnhImage { get; init; } = string.Empty;
 }

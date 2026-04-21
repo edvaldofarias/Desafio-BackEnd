@@ -1,7 +1,6 @@
 ﻿using Bogus;
 using Bogus.Extensions.Brazil;
 using Job.Application.Commands.Motoboy;
-using Job.Domain.Enums;
 
 namespace Job.Commons.Domain.Commands.User.Motoboy;
 
@@ -11,12 +10,12 @@ public static class CreateMotoboyCommandFaker
     {
         return new Faker<CreateMotoboyCommand>()
             .CustomInstantiator(faker => new CreateMotoboyCommand(
-                faker.Person.FullName,
-                faker.Internet.Password(),
-                faker.Company.Cnpj(),
-                faker.Person.DateOfBirth,
-                "77058710884",
-                faker.PickRandom<ECnhType>()
+                Identifier: faker.Random.AlphaNumeric(8),
+                Name: faker.Person.FullName,
+                Cnpj: faker.Company.Cnpj(),
+                DateBirth: faker.Person.DateOfBirth,
+                Cnh: "77058710884",
+                TypeCnh: faker.PickRandom("A", "B", "A+B")
             ));
     }
 
@@ -24,12 +23,12 @@ public static class CreateMotoboyCommandFaker
     {
         return new Faker<CreateMotoboyCommand>()
             .CustomInstantiator(faker => new CreateMotoboyCommand(
-                string.Empty,
-                faker.Lorem.Letter(5),
-                faker.Random.AlphaNumeric(5),
-                DateTime.Now,
-                faker.Random.AlphaNumeric(5),
-                faker.PickRandom<ECnhType>()
+                Identifier: string.Empty,
+                Name: string.Empty,
+                Cnpj: faker.Random.AlphaNumeric(5),
+                DateBirth: DateTime.Now,
+                Cnh: faker.Random.AlphaNumeric(5),
+                TypeCnh: "Z"
             ));
     }
 }

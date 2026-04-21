@@ -20,9 +20,19 @@ public class MotoboyRepository(JobContext context) : IMotoboyRepository
         return await context.Motoboys.Where(x => x.Cnpj == cnpj).FirstOrDefaultAsync(cancellationToken);
     }
 
+    public async Task<MotoboyEntity?> GetByIdentifierAsync(string identifier, CancellationToken cancellationToken)
+    {
+        return await context.Motoboys.Where(x => x.Identifier == identifier).FirstOrDefaultAsync(cancellationToken);
+    }
+
     public async Task<bool> CheckCnpjExistsAsync(string cnpj, CancellationToken cancellationToken)
     {
         return await context.Motoboys.AnyAsync(x => x.Cnpj == cnpj, cancellationToken);
+    }
+
+    public async Task<bool> CheckIdentifierExistsAsync(string identifier, CancellationToken cancellationToken)
+    {
+        return await context.Motoboys.AnyAsync(x => x.Identifier == identifier, cancellationToken);
     }
 
     public async Task CreateAsync(MotoboyEntity motoboy, CancellationToken cancellationToken)

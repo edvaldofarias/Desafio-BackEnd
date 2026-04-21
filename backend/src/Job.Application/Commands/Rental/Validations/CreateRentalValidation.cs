@@ -4,18 +4,34 @@ public sealed class CreateRentalValidation : AbstractValidator<CreateRentalComma
 {
     public CreateRentalValidation()
     {
-        RuleFor(x => x.IdMoto)
+        RuleFor(x => x.Identifier)
             .NotEmpty()
-            .WithMessage("IdMoto é obrigatorio para criar um aluguel");
+            .WithMessage("Identificador é obrigatório");
+
+        RuleFor(x => x.MotoboyIdentifier)
+            .NotEmpty()
+            .WithMessage("Entregador é obrigatório");
+
+        RuleFor(x => x.MotoIdentifier)
+            .NotEmpty()
+            .WithMessage("Moto é obrigatória");
+
+        RuleFor(x => x.DateStart)
+            .NotEmpty()
+            .WithMessage("Data de início é obrigatória");
+
+        RuleFor(x => x.DateEnd)
+            .NotEmpty()
+            .WithMessage("Data de término é obrigatória")
+            .GreaterThan(x => x.DateStart)
+            .WithMessage("Data de término deve ser maior que a data de início");
 
         RuleFor(x => x.DatePreview)
             .NotEmpty()
-            .WithMessage("Previsão de terminio é obrigatorio para criar um aluguel")
-            .GreaterThan(DateTime.Now.AddDays(1))
-            .WithMessage("Previsão de terminio deve ser maior que a data atual");
+            .WithMessage("Previsão de término é obrigatória");
 
         RuleFor(x => x.Plan)
-            .NotEmpty()
-            .WithMessage("Plano é obrigatorio para criar um aluguel");
+            .IsInEnum()
+            .WithMessage("Plano inválido");
     }
 }

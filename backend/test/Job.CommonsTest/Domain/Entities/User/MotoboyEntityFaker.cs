@@ -11,7 +11,8 @@ public static class MotoboyEntityFaker
     {
         return new Faker<MotoboyEntity>()
             .CustomInstantiator(faker => new MotoboyEntity(
-                BCrypt.Net.BCrypt.HashPassword(password, 12),
+                faker.Random.AlphaNumeric(8),
+                BCrypt.Net.BCrypt.HashPassword(password ?? faker.Internet.Password(), 12),
                 faker.Person.FullName,
                 faker.Company.Cnpj(),
                 DateOnly.FromDateTime(faker.Person.DateOfBirth),
@@ -23,7 +24,8 @@ public static class MotoboyEntityFaker
     {
         return new Faker<MotoboyEntity>()
             .CustomInstantiator(faker => new MotoboyEntity(
-                faker.Internet.Password(),
+                faker.Random.AlphaNumeric(8),
+                BCrypt.Net.BCrypt.HashPassword(faker.Internet.Password(), 12),
                 faker.Person.FullName,
                 faker.Company.Cnpj(),
                 DateOnly.FromDateTime(faker.Person.DateOfBirth),

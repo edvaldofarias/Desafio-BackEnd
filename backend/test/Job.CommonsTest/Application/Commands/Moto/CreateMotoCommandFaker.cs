@@ -1,4 +1,4 @@
-﻿using Bogus;
+using Bogus;
 using Job.Application.Commands.Moto;
 
 namespace Job.Commons.Application.Commands.Moto;
@@ -9,9 +9,10 @@ public static class CreateMotoCommandFaker
     {
         return new Faker<CreateMotoCommand>()
             .CustomInstantiator(faker => new CreateMotoCommand(
-                faker.Random.Int(1900, 2050),
-                faker.Vehicle.Model(),
-                "AAA5F55"
+                Identifier: faker.Random.AlphaNumeric(8),
+                Year: faker.Random.Int(1900, 2050),
+                Model: faker.Vehicle.Model(),
+                Plate: "AAA5F55"
             ));
     }
 
@@ -19,9 +20,10 @@ public static class CreateMotoCommandFaker
     {
         return new Faker<CreateMotoCommand>()
             .CustomInstantiator(_ => new CreateMotoCommand(
-                0,
-                string.Empty,
-                string.Empty
+                Identifier: string.Empty,
+                Year: 0,
+                Model: string.Empty,
+                Plate: string.Empty
             ));
     }
 
@@ -29,9 +31,10 @@ public static class CreateMotoCommandFaker
     {
         return new Faker<CreateMotoCommand>()
             .CustomInstantiator(faker => new CreateMotoCommand(
-                faker.Random.Int(0, 1899),
-                string.Empty,
-                faker.Random.AlphaNumeric(1)
+                Identifier: string.Empty,
+                Year: faker.Random.Int(0, 1899),
+                Model: string.Empty,
+                Plate: faker.Random.AlphaNumeric(1)
             ));
     }
 }

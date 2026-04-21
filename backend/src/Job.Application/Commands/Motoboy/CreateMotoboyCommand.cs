@@ -1,11 +1,13 @@
-﻿using Job.Domain.Enums;
+﻿using System.Text.Json.Serialization;
+using Job.Domain.Enums;
 
 namespace Job.Application.Commands.Motoboy;
 
 public sealed record CreateMotoboyCommand(
-    string Name,
-    string Password,
-    string Cnpj,
-    DateTime DateBirth,
-    string Cnh,
-    ECnhType TypeCnh) : IRequest<Result>;
+    [property: JsonPropertyName("identificador")] string Identifier,
+    [property: JsonPropertyName("nome")] string Name,
+    [property: JsonPropertyName("cnpj")] string Cnpj,
+    [property: JsonPropertyName("data_nascimento")] DateTime DateBirth,
+    [property: JsonPropertyName("numero_cnh")] string Cnh,
+    [property: JsonPropertyName("tipo_cnh")] string TypeCnh,
+    [property: JsonPropertyName("imagem_cnh")] string? CnhImage = null) : IRequest<Result>;

@@ -4,6 +4,10 @@ public sealed class CreateMotoValidation : AbstractValidator<CreateMotoCommand>
 {
     public CreateMotoValidation()
     {
+        RuleFor(x => x.Identifier)
+            .NotEmpty()
+            .WithMessage("Identificador é obrigatório");
+
         RuleFor(x => x.Year)
             .NotEmpty()
             .WithMessage("Ano é obrigatório")

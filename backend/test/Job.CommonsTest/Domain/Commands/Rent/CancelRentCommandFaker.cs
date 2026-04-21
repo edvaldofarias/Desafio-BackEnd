@@ -9,8 +9,8 @@ public static class CancelRentCommandFaker
     {
         return new Faker<CancelRentalCommand>()
             .CustomInstantiator(faker => new CancelRentalCommand(
-                faker.Random.Guid(),
-                faker.Date.Future()
+                Identifier: faker.Random.AlphaNumeric(8),
+                DateReturn: faker.Date.Future()
             ));
     }
 
@@ -18,17 +18,17 @@ public static class CancelRentCommandFaker
     {
         return new Faker<CancelRentalCommand>()
             .CustomInstantiator(_ => new CancelRentalCommand(
-                Guid.Empty,
-                DateTime.MinValue
+                Identifier: string.Empty,
+                DateReturn: DateTime.MinValue
             ));
     }
 
     public static Faker<CancelRentalCommand> Invalid()
     {
         return new Faker<CancelRentalCommand>()
-            .CustomInstantiator(faker => new CancelRentalCommand(
-                Guid.Empty,
-                faker.Date.Past()
+            .CustomInstantiator(_ => new CancelRentalCommand(
+                Identifier: string.Empty,
+                DateReturn: DateTime.MinValue
             ));
     }
 }

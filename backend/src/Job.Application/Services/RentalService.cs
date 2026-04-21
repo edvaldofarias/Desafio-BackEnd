@@ -16,97 +16,105 @@ public sealed class RentalService(
     IMotoboyRepository motoboyRepository,
     IMotoRepository motoRepository) :
     IRequestHandler<CancelRentalCommand, Result<RentalDto>>,
-    IRequestHandler<CreateRentalCommand, Result<RentalDto>>
+    IRequestHandler<CreateRentalCommand, Result<RentalDto>>,
+    IRequestHandler<GetRentalCommand, Result<RentalDto>>
 {
+    public async Task<Result<RentalDto>> Handle(GetRentalCommand request, CancellationToken cancellationToken)
+    {
+        var rent = await rentalRepository.GetByIdentifierAsync(request.Identifier, cancellationToken);
+        if (rent is null)
+            return Result.Fail("Locação não encontrada");
+
+        var motoboy = await motoboyRepository.GetByIdAsync(rent.IdMotoboy, cancellationToken);
+        var moto = await motoRepository.GetByIdAsync(rent.IdMoto, cancellationToken);
+        return Result.Ok(MapToDto(rent, motoboy, moto));
+    }
+
     public async Task<Result<RentalDto>> Handle(CancelRentalCommand request, CancellationToken cancellationToken)
     {
-        logger.LogInformation("Iniciando o processo de cancelamento de um aluguel");
         var validate = await new CancelRentalValidation().ValidateAsync(request, cancellationToken);
-
-        logger.LogInformation("Buscando aluguel");
-        var rent = await rentalRepository.GetByIdAsync(request.Id, cancellationToken);
-        if (rent is null)
-        {
-            logger.LogInformation("Aluguel não encontrado {id}", request.Id);
-            validate.Errors.Add(new ValidationFailure("Id", "Aluguel não encontrado"));
-        }
-
         if (!validate.IsValid)
-        {
-            logger.LogInformation("Erros de validação encontrados {errors}", validate.Errors);
             return Result.Fail(validate.Errors.Select(x => x.ErrorMessage));
-        }
 
-        rent!.CalculateFine(DateOnly.FromDateTime(request.DatePreview));
+        var rent = await rentalRepository.GetByIdentifierAsync(request.Identifier, cancellationToken);
+        if (rent is null)
+            return Result.Fail("Locação não encontrada");
+
+        rent.RegisterReturn(DateOnly.FromDateTime(request.DateReturn));
         await rentalRepository.UpdateAsync(rent, cancellationToken);
 
-        var rentalDto = new RentalDto(rent.Id, rent.Value, rent.Plan, rent.Fine);
-        return Result.Ok(rentalDto).WithSuccess("Cancelamento realizado com sucesso");
+        var motoboy = await motoboyRepository.GetByIdAsync(rent.IdMotoboy, cancellationToken);
+        var moto = await motoRepository.GetByIdAsync(rent.IdMoto, cancellationToken);
+        return Result.Ok(MapToDto(rent, motoboy, moto)).WithSuccess("Data de devolução informada com sucesso");
     }
 
     public async Task<Result<RentalDto>> Handle(CreateRentalCommand request, CancellationToken cancellationToken)
     {
-        logger.LogInformation("Iniciando o processo de criação de um aluguel");
         var validate = await new CreateRentalValidation().ValidateAsync(request, cancellationToken);
 
-        logger.LogInformation("Buscando motoboy");
-        var motoboy = await GetMotoboyEntity(request, validate, cancellationToken);
+        var motoboy = await GetMotoboyEntity(request.MotoboyIdentifier, validate, cancellationToken);
+        var moto = await GetMotoEntity(request.MotoIdentifier, validate, cancellationToken);
 
-        var moto = await GetMotoEntity(request, validate, cancellationToken);
+        if (await rentalRepository.CheckIdentifierExistsAsync(request.Identifier, cancellationToken))
+            validate.Errors.Add(new ValidationFailure("identificador", "Identificador já cadastrado"));
 
         if (!validate.IsValid)
-        {
-            logger.LogInformation("Erros de validação encontrados {errors}", validate.Errors);
             return Result.Fail(validate.Errors.Select(x => x.ErrorMessage));
-        }
 
-        logger.LogInformation("Criando objeto aluguel");
         var rentEntity = new RentalEntity(
-            motoboy!.Id, 
-            moto!.Id, DateOnly.FromDateTime(request.DatePreview),
+            request.Identifier,
+            motoboy!.Id,
+            moto!.Id,
+            DateOnly.FromDateTime(request.DateStart),
+            DateOnly.FromDateTime(request.DateEnd),
+            DateOnly.FromDateTime(request.DatePreview),
             request.Plan);
 
         await rentalRepository.CreateAsync(rentEntity, cancellationToken);
+        logger.LogInformation("Locação {Identifier} criada", rentEntity.Identifier);
 
-        logger.LogInformation("Aluguel criado com sucesso");
-        var rentalDto = new RentalDto(rentEntity.Id, rentEntity.Value, rentEntity.Plan);
-        return Result.Ok(rentalDto);
+        return Result.Ok(MapToDto(rentEntity, motoboy, moto));
     }
-    
-    #region private methods
 
-    private async Task<MotoboyEntity?> GetMotoboyEntity(CreateRentalCommand command, ValidationResult validate,
+    private static RentalDto MapToDto(RentalEntity rent, MotoboyEntity? motoboy, MotoEntity? moto)
+    {
+        return new RentalDto(
+            rent.Identifier,
+            rent.DailyValue,
+            motoboy?.Identifier ?? string.Empty,
+            moto?.Identifier ?? string.Empty,
+            rent.DateStart.ToDateTime(TimeOnly.MinValue),
+            rent.DateEnd.ToDateTime(TimeOnly.MinValue),
+            rent.DatePreview.ToDateTime(TimeOnly.MinValue),
+            rent.DateReturn?.ToDateTime(TimeOnly.MinValue),
+            rent.Value,
+            rent.Fine);
+    }
+
+    private async Task<MotoboyEntity?> GetMotoboyEntity(string identifier, ValidationResult validate,
         CancellationToken cancellationToken)
     {
-        var motoboy = await motoboyRepository.GetByCnpjAsync(command.Cnpj, cancellationToken);
-
+        var motoboy = await motoboyRepository.GetByIdentifierAsync(identifier, cancellationToken);
         if (motoboy is null)
         {
-            logger.LogInformation("Motoboy não encontrado {Cnpj}", command.Cnpj);
-            validate.Errors.Add(new ValidationFailure("IdMotoboy", "Motoboy não encontrado"));
+            validate.Errors.Add(new ValidationFailure("entregador_id", "Entregador não encontrado"));
+            return null;
         }
-
-        if (motoboy is null) return motoboy;
 
         if (motoboy.Type is ECnhType.A or ECnhType.AB) return motoboy;
 
-        logger.LogInformation("Motoboy não possui CNH categoria A");
-        validate.Errors.Add(new ValidationFailure("TypeCnh", "Somente entregadores habilitados na categoria A podem efetuar uma locação"));
-
+        validate.Errors.Add(new ValidationFailure("tipo_cnh",
+            "Somente entregadores habilitados na categoria A podem efetuar uma locação"));
         return motoboy;
     }
 
-    private async Task<MotoEntity?> GetMotoEntity(CreateRentalCommand command, ValidationResult validate, CancellationToken cancellationToken)
+    private async Task<MotoEntity?> GetMotoEntity(string identifier, ValidationResult validate,
+        CancellationToken cancellationToken)
     {
-        var moto = await motoRepository.GetByIdAsync(command.IdMoto, cancellationToken);
-
+        var moto = await motoRepository.GetByIdentifierAsync(identifier, cancellationToken);
         if (moto is not null) return moto;
 
-        logger.LogInformation("Moto não encontrada {id}", command.IdMoto);
-        validate.Errors.Add(new ValidationFailure("IdMoto", "Moto não encontrada"));
-
-        return moto;
+        validate.Errors.Add(new ValidationFailure("moto_id", "Moto não encontrada"));
+        return null;
     }
-
-    #endregion
 }

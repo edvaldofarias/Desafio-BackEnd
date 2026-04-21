@@ -1,3 +1,7 @@
-﻿namespace Job.Application.Commands.Moto;
+﻿using System.Text.Json.Serialization;
 
-public sealed record UpdateMotoCommand(Guid Id, string Plate) : IRequest<Result>;
+namespace Job.Application.Commands.Moto;
+
+public sealed record UpdateMotoCommand(
+    [property: JsonIgnore] string Identifier,
+    [property: JsonPropertyName("placa")] string Plate) : IRequest<Result>;

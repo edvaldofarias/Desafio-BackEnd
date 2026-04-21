@@ -7,12 +7,13 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Job.WebApi.Controllers;
 
+[Route("Manager")]
 [AllowAnonymous]
 public class ManagerController(
     ILogger<ManagerController> logger,
     IMediator mediator) : BaseController
 {
-    [HttpPost]
+    [HttpPost("Authentication")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]

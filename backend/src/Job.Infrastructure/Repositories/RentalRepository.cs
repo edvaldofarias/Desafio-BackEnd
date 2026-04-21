@@ -15,6 +15,11 @@ public class RentalRepository(JobContext context) : IRentalRepository
         return await context.Rents.Where(x => x.Id == id).FirstOrDefaultAsync(cancellationToken);
     }
 
+    public async Task<RentalEntity?> GetByIdentifierAsync(string identifier, CancellationToken cancellationToken)
+    {
+        return await context.Rents.Where(x => x.Identifier == identifier).FirstOrDefaultAsync(cancellationToken);
+    }
+
     public async Task<RentalEntity?> GetByMotoIdAsync(Guid id, CancellationToken cancellationToken)
     {
         return await context.Rents.Where(x => x.IdMoto == id).FirstOrDefaultAsync(cancellationToken);
@@ -23,6 +28,11 @@ public class RentalRepository(JobContext context) : IRentalRepository
     public Task<bool> ExistsForMotoAsync(Guid motoId, CancellationToken cancellationToken)
     {
         return context.Rents.AnyAsync(x => x.IdMoto == motoId, cancellationToken);
+    }
+
+    public Task<bool> CheckIdentifierExistsAsync(string identifier, CancellationToken cancellationToken)
+    {
+        return context.Rents.AnyAsync(x => x.Identifier == identifier, cancellationToken);
     }
 
     public async Task UpdateAsync(RentalEntity rental, CancellationToken cancellationToken)

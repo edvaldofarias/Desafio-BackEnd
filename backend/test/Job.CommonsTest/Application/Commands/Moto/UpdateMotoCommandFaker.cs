@@ -9,8 +9,8 @@ public static class UpdateMotoCommandFaker
     {
         return new Faker<UpdateMotoCommand>()
             .CustomInstantiator(faker => new UpdateMotoCommand(
-                faker.Random.Guid(),
-                "AAA5F55"
+                Identifier: faker.Random.AlphaNumeric(8),
+                Plate: "AAA5F55"
             ));
     }
 
@@ -18,8 +18,8 @@ public static class UpdateMotoCommandFaker
     {
         return new Faker<UpdateMotoCommand>()
             .CustomInstantiator(_ => new UpdateMotoCommand(
-                Guid.Empty,
-                string.Empty
+                Identifier: string.Empty,
+                Plate: string.Empty
             ));
     }
 
@@ -27,8 +27,8 @@ public static class UpdateMotoCommandFaker
     {
         return new Faker<UpdateMotoCommand>()
             .CustomInstantiator(faker => new UpdateMotoCommand(
-                Guid.Empty,
-                faker.Random.AlphaNumeric(1)
+                Identifier: string.Empty,
+                Plate: faker.Random.AlphaNumeric(1)
             ));
     }
 }

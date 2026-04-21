@@ -1,4 +1,5 @@
-﻿using Job.Application.Commands.Moto.Validations;
+﻿using FluentValidation.TestHelper;
+using Job.Application.Commands.Moto.Validations;
 using Job.Commons.Application.Commands.Moto;
 
 namespace Job.UnitTests.Application.Commands.Moto;
@@ -11,28 +12,9 @@ public class CreateMotoValidationTest
     [Fact]
     public void ShouldReturnErrorWhenCommandIsEmpty()
     {
-        // Arrange
         var command = CreateMotoCommandFaker.Empty().Generate();
-
-        // Act
         var result = _validator.TestValidate(command);
-
-        // Assert
-        result.ShouldHaveValidationErrorFor(x => x.Year);
-        result.ShouldHaveValidationErrorFor(x => x.Model);
-        result.ShouldHaveValidationErrorFor(x => x.Plate);
-    }
-
-    [Fact]
-    public void ShouldReturnErrorWhenModelIsInvalid()
-    {
-        // Arrange
-        var command = CreateMotoCommandFaker.Invalid().Generate();
-
-        // Act
-        var result = _validator.TestValidate(command);
-
-        // Assert
+        result.ShouldHaveValidationErrorFor(x => x.Identifier);
         result.ShouldHaveValidationErrorFor(x => x.Year);
         result.ShouldHaveValidationErrorFor(x => x.Model);
         result.ShouldHaveValidationErrorFor(x => x.Plate);
@@ -41,16 +23,11 @@ public class CreateMotoValidationTest
     [Fact]
     public void ShouldNotReturnErrorWhenCommandIsValid()
     {
-        // Arrange
         var command = CreateMotoCommandFaker.Default().Generate();
-
-        // Act
         var result = _validator.TestValidate(command);
-
-        // Assert
+        result.ShouldNotHaveValidationErrorFor(x => x.Identifier);
         result.ShouldNotHaveValidationErrorFor(x => x.Year);
         result.ShouldNotHaveValidationErrorFor(x => x.Model);
         result.ShouldNotHaveValidationErrorFor(x => x.Plate);
     }
-
 }

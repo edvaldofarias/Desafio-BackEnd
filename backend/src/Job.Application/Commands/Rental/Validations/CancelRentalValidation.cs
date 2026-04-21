@@ -4,14 +4,12 @@ public sealed class CancelRentalValidation : AbstractValidator<CancelRentalComma
 {
     public CancelRentalValidation()
     {
-        RuleFor(x => x.Id)
+        RuleFor(x => x.Identifier)
             .NotEmpty()
-            .WithMessage("Id é obrigatorio para cancelar um aluguel");
+            .WithMessage("Identificador é obrigatório");
 
-        RuleFor(x => x.DatePreview)
+        RuleFor(x => x.DateReturn)
             .NotEmpty()
-            .WithMessage("Previsão de terminio é obrigatorio para cancelar um aluguel")
-            .GreaterThan(DateTime.Now)
-            .WithMessage("Previsão de terminio deve ser maior que a data atual");
+            .WithMessage("Data de devolução é obrigatória");
     }
 }
