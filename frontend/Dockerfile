@@ -2,8 +2,11 @@
 FROM node:20-alpine AS build
 WORKDIR /app
 
-COPY package.json package-lock.json ./
-RUN npm ci
+# Copia somente o manifest para otimizar cache. O lock é regenerado dentro
+# do container pois pode conter deps opcionais específicas da plataforma do
+# desenvolvedor (ex.: chokidar/fsevents em macOS) que não existem no Linux.
+COPY package.json package-lock.json* ./
+RUN npm install --no-audit --no-fund --loglevel=error
 
 COPY . .
 RUN npm run build -- --configuration production

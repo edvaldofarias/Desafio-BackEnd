@@ -1,3 +1,3 @@
 ﻿namespace Job.Application.Dtos.Motoboy;
 
-public sealed record MotoboyDto(string Identifier, string Cnpj);
+public sealed record MotoboyDto(string Identifier, string Cnpj, string Name);

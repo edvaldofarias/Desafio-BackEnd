@@ -4,11 +4,13 @@ import { Router, RouterLink } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
 import { CreateMotoboy, MotoboyApi } from '../../core/api/motoboy.api';
 import { extractErrorMessage } from '../../core/error.util';
+import { MaskDirective } from '../../core/mask.directive';
+import { onlyDigits } from '../../core/mask.util';
 
 @Component({
   selector: 'app-motoboy-register',
   standalone: true,
-  imports: [FormsModule, RouterLink],
+  imports: [FormsModule, RouterLink, MaskDirective],
   template: `
     <section class="card" style="max-width:560px;margin:0 auto;">
       <h1>Cadastro de Entregador</h1>
@@ -17,7 +19,7 @@ import { extractErrorMessage } from '../../core/error.util';
         <input id="nome" name="nome" [(ngModel)]="form.nome" required />
 
         <label for="cnpj">CNPJ</label>
-        <input id="cnpj" name="cnpj" [(ngModel)]="form.cnpj" required />
+        <input id="cnpj" name="cnpj" appMask="cnpj" inputmode="numeric" placeholder="00.000.000/0000-00" [(ngModel)]="form.cnpj" required />
 
         <label for="senha">Senha</label>
         <input id="senha" name="senha" type="password" minlength="6"
@@ -32,7 +34,7 @@ import { extractErrorMessage } from '../../core/error.util';
                [max]="maxBirthDate" [(ngModel)]="form.data_nascimento" required />
 
         <label for="numero_cnh">Número da CNH</label>
-        <input id="numero_cnh" name="numero_cnh" [(ngModel)]="form.numero_cnh" required />
+        <input id="numero_cnh" name="numero_cnh" appMask="cnh" inputmode="numeric" placeholder="000.000.000-00" [(ngModel)]="form.numero_cnh" required />
 
         <label for="tipo_cnh">Tipo da CNH</label>
         <select id="tipo_cnh" name="tipo_cnh" [(ngModel)]="form.tipo_cnh" required>
@@ -93,6 +95,8 @@ export class MotoboyRegisterComponent {
     this.loading.set(true);
     const payload: CreateMotoboy = {
       ...this.form,
+      cnpj: onlyDigits(this.form.cnpj),
+      numero_cnh: onlyDigits(this.form.numero_cnh),
       data_nascimento: new Date(this.form.data_nascimento).toISOString()
     };
     this.api.register(payload).subscribe({

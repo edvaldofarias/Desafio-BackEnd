@@ -41,10 +41,11 @@ describe('AuthService', () => {
   it('persists motoboy session and exposes id', () => {
     service.loginMotoboy('00000000000000', 'pwd').subscribe();
     const req = http.expectOne(`${environment.apiUrl}/entregadores/authentication`);
-    req.flush({ token: 't2', data: { identificador: 'm-1', cnpj: '00000000000000' } });
+    req.flush({ token: 't2', data: { identifier: 'm-1', cnpj: '00000000000000', name: 'João' } });
 
     expect(service.role()).toBe('entregador');
     expect(service.motoboyId()).toBe('m-1');
+    expect(service.displayName()).toBe('João');
     expect(service.token()).toBe('t2');
   });
 

@@ -4,17 +4,19 @@ import { Router, RouterLink } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
 import { AuthService } from '../../core/auth.service';
 import { extractErrorMessage } from '../../core/error.util';
+import { MaskDirective } from '../../core/mask.directive';
+import { onlyDigits } from '../../core/mask.util';
 
 @Component({
   selector: 'app-motoboy-login',
   standalone: true,
-  imports: [FormsModule, RouterLink],
+  imports: [FormsModule, RouterLink, MaskDirective],
   template: `
     <section class="card" style="max-width:420px;margin:0 auto;">
       <h1>Login Entregador</h1>
       <form (submit)="submit($event)">
         <label for="cnpj">CNPJ</label>
-        <input id="cnpj" name="cnpj" [(ngModel)]="cnpj" required />
+        <input id="cnpj" name="cnpj" appMask="cnpj" inputmode="numeric" placeholder="00.000.000/0000-00" [(ngModel)]="cnpj" required />
 
         <label for="password">Senha</label>
         <input id="password" name="password" type="password" [(ngModel)]="password" required />
@@ -44,7 +46,7 @@ export class MotoboyLoginComponent {
     ev.preventDefault();
     this.error.set(null);
     this.loading.set(true);
-    this.auth.loginMotoboy(this.cnpj, this.password).subscribe({
+    this.auth.loginMotoboy(onlyDigits(this.cnpj), this.password).subscribe({
       next: () => { this.loading.set(false); this.router.navigateByUrl('/motoboy/painel'); },
       error: (err: HttpErrorResponse) => { this.loading.set(false); this.error.set(extractErrorMessage(err)); }
     });

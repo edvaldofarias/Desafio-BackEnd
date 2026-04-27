@@ -31,7 +31,7 @@ public sealed class MotoboyService(
 
         if (motoboy is not null && BCrypt.Net.BCrypt.Verify(request.Password, motoboy.Password))
         {
-            var query = new MotoboyDto(motoboy.Identifier, motoboy.Cnpj);
+            var query = new MotoboyDto(motoboy.Identifier, motoboy.Cnpj, motoboy.Name);
             return Result.Ok(query);
         }
 
