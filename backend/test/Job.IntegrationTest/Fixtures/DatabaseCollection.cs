@@ -1,7 +1,6 @@
-﻿namespace Job.IntegrationTest.Fixtures;
+namespace Job.IntegrationTest.Fixtures;
 
 [CollectionDefinition("Database")]
-public class DatabaseCollection : ICollectionFixture<DbFixture>
+public class DatabaseCollection : ICollectionFixture<DbFixture>, ICollectionFixture<RabbitMqFixture>
 {
-    
 }

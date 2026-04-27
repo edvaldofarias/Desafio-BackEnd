@@ -1,3 +1,189 @@
+# Desafio Backend — Mottu
+
+Projeto desenvolvido durante o processo seletivo, implementando uma API REST
+para o gerenciamento de aluguel de motos por entregadores. A solução segue o
+contrato definido no Swagger oficial do desafio (campos `snake_case`,
+identificadores externos como `string` e respostas de erro no formato
+`{ "mensagem": "..." }`).
+
+## Stack
+
+- .NET 8 / C# 12
+- PostgreSQL + EF Core (Npgsql)
+- RabbitMQ 3.13 (publisher + consumer hospedado em `BackgroundService`)
+- MediatR + FluentResults + FluentValidation
+- BCrypt.NET, Swashbuckle (Swagger)
+- xUnit, FluentAssertions, Moq, NetArchTest, Bogus
+- Docker / Docker Compose
+
+## Como executar
+
+Pré-requisitos: Docker e Docker Compose.
+
+```bash
+cd backend
+docker compose up -d --build
+```
+
+Serviços expostos:
+
+| Serviço      | URL                                       |
+|--------------|-------------------------------------------|
+| API          | http://localhost:5001/swagger             |
+| PostgreSQL   | localhost:5432 (postgres / postgres)      |
+| RabbitMQ UI  | http://localhost:15672 (guest / guest)    |
+
+A primeira execução roda automaticamente as migrations. Imagens enviadas para
+`/entregadores/{id}/cnh` são salvas em volume Docker e expostas em
+`http://localhost:5001/uploads/<arquivo>`.
+
+## Configurações principais
+
+`appsettings.json`:
+
+```json
+{
+  "ConnectionStrings": {
+    "DefaultConnection": "Server=postgres;Port=5432;User Id=postgres;Password=postgres;Database=job;"
+  },
+  "Jwt":      { "Secret": "<segredo-de-32-ou-mais-chars>" },
+  "Storage":  { "RootPath": "uploads", "PublicBaseUrl": "/uploads" },
+  "RabbitMq": {
+    "HostName": "rabbitmq",
+    "Port": 5672,
+    "UserName": "guest",
+    "Password": "guest",
+    "MotoCreatedExchange": "moto.created",
+    "MotoCreatedQueue": "moto.created.year-2024"
+  }
+}
+```
+
+Em produção, sobrescreva `Jwt:Secret` e credenciais via variáveis de ambiente
+(`Jwt__Secret`, `RabbitMq__Password`, etc.).
+
+## Endpoints (contrato Swagger)
+
+Todos os payloads usam `snake_case`. Erros retornam `400` ou `404` com
+`{ "mensagem": "..." }`.
+
+### Motos — `/motos`
+
+| Método | Rota                  | Descrição                         |
+|--------|-----------------------|-----------------------------------|
+| POST   | `/motos`              | Cadastra moto                     |
+| GET    | `/motos?placa=`       | Lista motos (filtro opcional)     |
+| GET    | `/motos/{id}`         | Busca moto por identificador      |
+| PUT    | `/motos/{id}/placa`   | Atualiza apenas a placa           |
+| DELETE | `/motos/{id}`         | Remove moto sem locações          |
+
+```json
+POST /motos
+{
+  "identificador": "moto123",
+  "ano": 2024,
+  "modelo": "Mottu Sport",
+  "placa": "CDX-0101"
+}
+```
+
+### Entregadores — `/entregadores`
+
+| Método | Rota                            | Descrição                         |
+|--------|---------------------------------|-----------------------------------|
+| POST   | `/entregadores`                 | Cadastra entregador               |
+| POST   | `/entregadores/{id}/cnh`        | Atualiza imagem da CNH (base64)   |
+
+```json
+POST /entregadores
+{
+  "identificador": "entregador123",
+  "nome": "João Entregador",
+  "cnpj": "12345678000195",
+  "data_nascimento": "1990-01-01",
+  "numero_cnh": "77058710884",
+  "tipo_cnh": "A",        // "A" | "B" | "A+B"
+  "imagem_cnh": null       // opcional, base64 png/bmp
+}
+```
+
+```json
+POST /entregadores/{id}/cnh
+{ "imagem_cnh": "data:image/png;base64,iVBORw0KGgo..." }
+```
+
+### Locação — `/locacao`
+
+| Método | Rota                          | Descrição                                 |
+|--------|-------------------------------|-------------------------------------------|
+| POST   | `/locacao`                    | Aluga uma moto (planos 7,15,30,45,50)     |
+| GET    | `/locacao/{id}`               | Consulta locação por identificador        |
+| PUT    | `/locacao/{id}/devolucao`     | Informa devolução e calcula multa/valor   |
+
+```json
+POST /locacao
+{
+  "identificador": "locacao123",
+  "entregador_id": "entregador123",
+  "moto_id": "moto123",
+  "data_inicio": "2026-05-01T00:00:00Z",
+  "data_termino": "2026-05-08T00:00:00Z",
+  "data_previsao_termino": "2026-05-08T00:00:00Z",
+  "plano": 7
+}
+```
+
+Regras de cálculo:
+
+- Diárias: `7=R$30`, `15=R$28`, `30=R$22`, `45=R$20`, `50=R$18`.
+- Devolução **antes** da previsão: cobra dias usados + multa (20% do valor das
+  diárias não utilizadas no plano de 7 dias, 40% nos demais).
+- Devolução **depois** da previsão: cobra todas as diárias do plano +
+  R$50,00 por dia adicional.
+- Apenas entregadores com CNH categoria `A` ou `A+B` podem alugar.
+
+### Manager (legado) — `/manager`
+
+| Método | Rota                      | Descrição                       |
+|--------|---------------------------|---------------------------------|
+| POST   | `/manager/authentication` | Login admin com JWT (uso interno)|
+
+Credenciais semeadas: `job@job.com` / `mudar@123`.
+
+## Mensageria (RabbitMQ)
+
+Ao cadastrar uma moto a API publica `MotoCreatedEvent` na exchange
+`moto.created`. O `MotoNotificationConsumer` (BackgroundService) consome a fila
+`moto.created.year-2024`, filtra eventos cujo `Year == 2024` e persiste a
+notificação na tabela `MotoNotifications`.
+
+## Testes
+
+```bash
+cd backend
+# unit + arquitetura
+dotnet test Job.sln --filter "FullyQualifiedName!~IntegrationTest"
+
+# integração (requer Postgres em localhost:5432)
+dotnet test test/Job.IntegrationTest
+```
+
+## Estrutura
+
+```
+backend/
+├── docker-compose.yml          # API + Postgres + RabbitMQ
+├── src/
+│   ├── Job.Domain              # Entidades, regras puras
+│   ├── Job.Application         # Commands, Services, Validations
+│   ├── Job.Infrastructure      # EF Core, Repositórios, Storage, Messaging
+│   └── Job.WebApi              # Controllers, Program.cs, Middlewares
+└── test/
+    ├── Job.UnitTests
+    ├── Job.ArchitectureTest
+    ├── Job.IntegrationTest
+    └── Job.CommonsTest         # Fakers compartilhados (Bogus)
+```
 # Introdução
 
 Projetos desenvolvidos durante o processo seletivo, com o objetivo específico de criar uma aplicação 

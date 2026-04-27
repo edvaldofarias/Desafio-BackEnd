@@ -1,4 +1,5 @@
-﻿using Job.Application.Commands.Manager;
+using Job.Application.Commands.Manager;
+using Job.IntegrationTest.Fixtures;
 
 namespace Job.IntegrationTest.Controllers;
 
@@ -6,47 +7,44 @@ namespace Job.IntegrationTest.Controllers;
 [Trait("Integration", "Manager")]
 public class ManagerControllerTest(SetupFactory factory) : IClassFixture<SetupFactory>
 {
-    private readonly Faker _faker = new Faker();
+    private readonly Faker _faker = new();
 
-    [Fact]
-    public async Task AuthenticationManagerCommand_WhenValid_ShouldReturnUnauthorized()
+    [SkippableFact]
+    public async Task AuthenticationManagerCommand_WithUnknownEmail_ShouldReturnBadRequest()
     {
-        // Arrange
+        Skip.IfNot(factory.Db.IsAvailable, factory.Db.UnavailableReason);
+
         var client = factory.CreateClient();
         var content = new AuthenticationManagerCommand(_faker.Person.Email, _faker.Internet.Password());
 
-        // Act
         var response = await client.PostAsJsonAsync("/manager/authentication", content);
 
-        // Assert
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
     }
 
-    [Fact]
-    public async Task AuthenticationManagerCommand_WhenValid_ShouldReturnOk()
+    [SkippableFact]
+    public async Task AuthenticationManagerCommand_WithSeededCredentials_ShouldReturnOk()
     {
-        // Arrange
+        Skip.IfNot(factory.Db.IsAvailable, factory.Db.UnavailableReason);
+
         var client = factory.CreateClient();
         var content = new AuthenticationManagerCommand("job@job.com", "mudar@123");
 
-        // Act
         var response = await client.PostAsJsonAsync("/manager/authentication", content);
 
-        // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
     }
 
-    [Fact]
-    public async Task AuthenticationManagerCommand_WhenValid_ShouldReturnBadRequest()
+    [SkippableFact]
+    public async Task AuthenticationManagerCommand_WithGarbage_ShouldReturnBadRequest()
     {
-        // Arrange
+        Skip.IfNot(factory.Db.IsAvailable, factory.Db.UnavailableReason);
+
         var client = factory.CreateClient();
         var content = new AuthenticationManagerCommand(_faker.Random.AlphaNumeric(10), _faker.Random.AlphaNumeric(5));
 
-        // Act
         var response = await client.PostAsJsonAsync("/manager/authentication", content);
 
-        // Assert
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
     }
 }

@@ -30,7 +30,8 @@ public class MotoNotificationConfiguration : IEntityTypeConfiguration<MotoNotifi
             .HasMaxLength(10);
 
         builder.Property(x => x.OccurredAt)
-            .IsRequired();
+            .IsRequired()
+            .HasColumnType("timestamp with time zone");
 
         builder.HasIndex(x => x.MotoId);
     }

@@ -1,47 +1,80 @@
 ﻿using Job.Infrastructure.Context;
 using Microsoft.EntityFrameworkCore;
+using Npgsql;
 
 namespace Job.IntegrationTest.Fixtures;
 
-public class DbFixture : IDisposable, IAsyncDisposable
+public sealed class DbFixture : IAsyncLifetime
 {
-    private readonly JobContext _context;
-    private readonly string _databaseName = $"Context_{Guid.NewGuid().ToString()}";
-    public readonly string ConnectionString;
-    private bool _disposed;
+    private readonly string _databaseName = $"job_it_{Guid.NewGuid():N}";
+    private string? _adminConnectionString;
 
-    public DbFixture()
+    public string ConnectionString { get; private set; } = string.Empty;
+    public bool IsAvailable { get; private set; }
+    public string? UnavailableReason { get; private set; }
+
+    public async Task InitializeAsync()
     {
-        ConnectionString = $"Server=localhost;Port=5432;User Id=postgres;Password=postgres;Database={_databaseName};";
+        var host = Environment.GetEnvironmentVariable("POSTGRES_HOST") ?? "localhost";
+        var port = Environment.GetEnvironmentVariable("POSTGRES_PORT") ?? "5432";
+        var user = Environment.GetEnvironmentVariable("POSTGRES_USER") ?? "postgres";
+        var password = Environment.GetEnvironmentVariable("POSTGRES_PASSWORD") ?? "postgres";
 
-        var builder = new DbContextOptionsBuilder<JobContext>();
-        builder.UseNpgsql(ConnectionString);
+        _adminConnectionString = $"Server={host};Port={port};User Id={user};Password={password};Database=postgres;";
+        ConnectionString = $"Server={host};Port={port};User Id={user};Password={password};Database={_databaseName};";
 
-        _context = new JobContext(builder.Options);
-    }
-
-    protected virtual void Dispose(bool disposing)
-    {
-        if (!_disposed)
+        try
         {
-            if (disposing)
+            await using var probe = new NpgsqlConnection(_adminConnectionString);
+            using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(3));
+            await probe.OpenAsync(cts.Token);
+
+            await using (var create = new NpgsqlCommand($"CREATE DATABASE \"{_databaseName}\";", probe))
             {
-                _context.Database.EnsureDeleted();
-                _context.Dispose();
+                await create.ExecuteNonQueryAsync(cts.Token);
             }
         }
+        catch (Exception ex)
+        {
+            IsAvailable = false;
+            UnavailableReason = $"Postgres indisponível em {host}:{port} ({ex.GetType().Name}: {ex.Message})";
+            return;
+        }
 
-        _disposed = true;
+        var options = new DbContextOptionsBuilder<JobContext>()
+            .UseNpgsql(ConnectionString)
+            .Options;
+
+        await using var context = new JobContext(options);
+        await context.Database.MigrateAsync();
+
+        IsAvailable = true;
     }
 
-    public void Dispose()
+    public async Task DisposeAsync()
     {
-        Dispose(true);
-        GC.SuppressFinalize(this);
-    }
+        if (!IsAvailable || _adminConnectionString is null)
+            return;
 
-    public async ValueTask DisposeAsync()
-    {
-        await _context.DisposeAsync();
+        try
+        {
+            await using var conn = new NpgsqlConnection(_adminConnectionString);
+            await conn.OpenAsync();
+
+            await using (var terminate = new NpgsqlCommand(
+                "SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = @db AND pid <> pg_backend_pid();",
+                conn))
+            {
+                terminate.Parameters.AddWithValue("db", _databaseName);
+                await terminate.ExecuteNonQueryAsync();
+            }
+
+            await using var drop = new NpgsqlCommand($"DROP DATABASE IF EXISTS \"{_databaseName}\";", conn);
+            await drop.ExecuteNonQueryAsync();
+        }
+        catch
+        {
+            // best effort cleanup
+        }
     }
 }
