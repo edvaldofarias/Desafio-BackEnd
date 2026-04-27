@@ -1,0 +1,30 @@
+<Solution>
+  <Folder Name="/Solution Items/">
+    <File Path=".gitignore" />
+    <File Path="Directory.Build.props" />
+    <File Path="Directory.Build.targets" />
+    <File Path="docker-compose.yml" />
+    <File Path="global.json" />
+    <File Path="nuget.config" />
+    <File Path="README.md" />
+  </Folder>
+  <Folder Name="/src/" />
+  <Folder Name="/src/01 - Presentation/">
+    <Project Path="src/Job.WebApi/Job.WebApi.csproj" />
+  </Folder>
+  <Folder Name="/src/02 - Application/">
+    <Project Path="src/Job.Application/Job.Application.csproj" />
+  </Folder>
+  <Folder Name="/src/03 - Domain/">
+    <Project Path="src/Job.Domain/Job.Domain.csproj" />
+  </Folder>
+  <Folder Name="/src/04 - Infrastructure/">
+    <Project Path="src/Job.Infrastructure/Job.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/test/">
+    <Project Path="test/Job.ArchitectureTest/Job.ArchitectureTest.csproj" />
+    <Project Path="test/Job.CommonsTest/Job.CommonsTest.csproj" />
+    <Project Path="test/Job.IntegrationTest/Job.IntegrationTest.csproj" />
+    <Project Path="test/Job.UnitTests/Job.UnitTests.csproj" />
+  </Folder>
+</Solution>

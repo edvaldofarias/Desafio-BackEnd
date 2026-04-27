@@ -10,7 +10,7 @@ public static class MotoEntityFaker
         return new Faker<MotoEntity>()
             .CustomInstantiator(faker => new MotoEntity(
                 faker.Random.AlphaNumeric(8),
-                faker.Random.Int(1900, 2050),
+                faker.Random.Int(1901, 2050),
                 faker.Vehicle.Model(),
                 faker.Vehicle.Vin()
             ));

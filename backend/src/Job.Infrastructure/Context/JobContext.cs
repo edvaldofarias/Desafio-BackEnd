@@ -3,6 +3,7 @@ using Job.Domain.Entities.Notification;
 using Job.Domain.Entities.Rental;
 using Job.Domain.Entities.User;
 using Job.Infrastructure.Conversions;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 
 namespace Job.Infrastructure.Context;
 
@@ -13,6 +14,12 @@ public sealed class JobContext : DbContext
     {
         AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
         AppContext.SetSwitch("Npgsql.DisableDateTimeInfinityConversions", true);
+    }
+
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    {
+        base.OnConfiguring(optionsBuilder);
+        optionsBuilder.ConfigureWarnings(w => w.Ignore(RelationalEventId.PendingModelChangesWarning));
     }
 
     protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
