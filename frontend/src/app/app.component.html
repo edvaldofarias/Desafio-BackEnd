@@ -1,10 +1,19 @@
-<nav class="topbar">
-  <a routerLink="/" class="brand">🛵 Mottu Test App</a>
-  @if (auth.isAuthenticated()) {
-    <span class="who">{{ auth.role() }} · {{ auth.identity() }}</span>
-    <button type="button" (click)="logout()">Sair</button>
-  }
+<nav class="sticky top-0 z-10 bg-white/90 backdrop-blur border-b border-slate-200">
+  <div class="max-w-5xl mx-auto px-4 h-14 flex items-center gap-4">
+    <a routerLink="/" class="flex items-center gap-2 font-semibold text-ink-900 no-underline">
+      <img src="mottu-logo.svg" alt="Mottu" class="h-8 w-8 rounded-md" />
+      <span>Mottu <span class="text-brand-600">Test App</span></span>
+    </a>
+    <div class="flex-1"></div>
+    @if (auth.isAuthenticated()) {
+      <span class="hidden sm:inline text-xs text-slate-500">
+        <span class="px-2 py-0.5 rounded-full bg-brand-50 text-brand-700 font-medium uppercase tracking-wide mr-2">{{ auth.role() }}</span>
+        {{ auth.identity() }}
+      </span>
+      <button type="button" class="btn btn-secondary !py-1.5 !px-3 text-xs" (click)="logout()">Sair</button>
+    }
+  </div>
 </nav>
-<main class="container">
+<main class="max-w-5xl mx-auto px-4 py-6">
   <router-outlet />
 </main>

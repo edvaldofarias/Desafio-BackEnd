@@ -34,6 +34,7 @@ public class RentalControllerTest(SetupFactory factory) : IClassFixture<SetupFac
             identificador = identifier,
             nome = _faker.Person.FullName,
             cnpj = _faker.Company.Cnpj(false),
+            senha = "senha-teste",
             data_nascimento = new DateTime(1990, 1, 1),
             numero_cnh = TestData.GenerateValidCnh(),
             tipo_cnh = typeCnh,

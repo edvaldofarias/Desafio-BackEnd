@@ -6,13 +6,13 @@ import { environment } from '../../../environments/environment';
 export type Plan = 7 | 15 | 30 | 45 | 50;
 
 export interface CreateRental {
-  identificador: string;
   entregador_id: string;
   moto_id: string;
   data_inicio: string;
   data_termino: string;
   data_previsao_termino: string;
   plano: Plan;
+  identificador?: string;
 }
 
 export interface Rental {
@@ -33,7 +33,7 @@ export class RentalApi {
   private http = inject(HttpClient);
   private base = `${environment.apiUrl}/locacao`;
 
-  create(body: CreateRental): Observable<unknown> { return this.http.post(this.base, body); }
+  create(body: CreateRental): Observable<Rental> { return this.http.post<Rental>(this.base, body); }
   get(id: string): Observable<Rental> { return this.http.get<Rental>(`${this.base}/${id}`); }
   return(id: string, dataDevolucao: string): Observable<unknown> {
     return this.http.put(`${this.base}/${id}/devolucao`, { data_devolucao: dataDevolucao });

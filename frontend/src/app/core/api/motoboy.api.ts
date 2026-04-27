@@ -4,12 +4,13 @@ import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 
 export interface CreateMotoboy {
-  identificador: string;
   nome: string;
   cnpj: string;
+  senha: string;
   data_nascimento: string;
   numero_cnh: string;
   tipo_cnh: 'A' | 'B' | 'AB';
+  identificador?: string;
   imagem_cnh?: string;
 }
 

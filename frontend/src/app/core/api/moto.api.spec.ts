@@ -34,7 +34,7 @@ describe('MotoApi', () => {
   });
 
   it('POST create sends body', () => {
-    const moto: Moto = { identificador: 'm1', ano: 2024, modelo: 'CG', placa: 'ABC1D23' };
+    const moto: Moto = { ano: 2024, modelo: 'CG', placa: 'ABC1D23' };
     api.create(moto).subscribe();
     const req = http.expectOne(base);
     expect(req.request.method).toBe('POST');

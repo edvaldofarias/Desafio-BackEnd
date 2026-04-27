@@ -15,13 +15,13 @@ public static class CreateRentCommandFaker
                 var preview = start.AddDays(7);
                 var end = preview.AddDays(1);
                 return new CreateRentalCommand(
-                    Identifier: faker.Random.AlphaNumeric(8),
                     MotoboyIdentifier: faker.Random.AlphaNumeric(8),
                     MotoIdentifier: faker.Random.AlphaNumeric(8),
                     DateStart: start,
                     DateEnd: end,
                     DatePreview: preview,
-                    Plan: EPlan.Sete);
+                    Plan: EPlan.Sete,
+                    Identifier: faker.Random.AlphaNumeric(8));
             });
     }
 
@@ -29,25 +29,25 @@ public static class CreateRentCommandFaker
     {
         return new Faker<CreateRentalCommand>()
             .CustomInstantiator(_ => new CreateRentalCommand(
-                Identifier: string.Empty,
                 MotoboyIdentifier: string.Empty,
                 MotoIdentifier: string.Empty,
                 DateStart: DateTime.MinValue,
                 DateEnd: DateTime.MinValue,
                 DatePreview: DateTime.MinValue,
-                Plan: 0));
+                Plan: 0,
+                Identifier: string.Empty));
     }
 
     public static Faker<CreateRentalCommand> Invalid()
     {
         return new Faker<CreateRentalCommand>()
             .CustomInstantiator(faker => new CreateRentalCommand(
-                Identifier: string.Empty,
                 MotoboyIdentifier: string.Empty,
                 MotoIdentifier: string.Empty,
                 DateStart: faker.Date.Past(),
                 DateEnd: faker.Date.Past(),
                 DatePreview: faker.Date.Past(),
-                Plan: 0));
+                Plan: 0,
+                Identifier: string.Empty));
     }
 }

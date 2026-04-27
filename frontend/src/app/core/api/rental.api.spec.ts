@@ -21,7 +21,7 @@ describe('RentalApi', () => {
 
   it('POST creates rental', () => {
     const body: CreateRental = {
-      identificador: 'r1', entregador_id: 'mb1', moto_id: 'm1',
+      entregador_id: 'mb1', moto_id: 'm1',
       data_inicio: '2026-01-01', data_termino: '2026-01-08',
       data_previsao_termino: '2026-01-08', plano: 7
     };

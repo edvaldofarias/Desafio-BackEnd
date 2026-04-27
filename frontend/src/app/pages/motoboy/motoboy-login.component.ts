@@ -28,9 +28,6 @@ import { extractErrorMessage } from '../../core/error.util';
         </div>
       </form>
       @if (error()) { <div class="error">{{ error() }}</div> }
-      <p style="margin-top:1rem;font-size:.85rem;color:#6c757d;">
-        A senha padrão de novos entregadores é <code>motoboy-default-password</code>.
-      </p>
     </section>
   `
 })
@@ -39,7 +36,7 @@ export class MotoboyLoginComponent {
   private router = inject(Router);
 
   cnpj = '';
-  password = 'motoboy-default-password';
+  password = '';
   protected loading = signal<boolean>(false);
   protected error = signal<string | null>(null);
 

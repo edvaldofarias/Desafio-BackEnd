@@ -21,7 +21,7 @@ describe('MotoboyApi', () => {
 
   it('POST register with full payload', () => {
     const body: CreateMotoboy = {
-      identificador: 'mb1', nome: 'Edvaldo', cnpj: '00000000000000',
+      nome: 'Edvaldo', cnpj: '00000000000000', senha: 'segredo123',
       data_nascimento: '1990-01-01', numero_cnh: '12345678900', tipo_cnh: 'A'
     };
     api.register(body).subscribe();

@@ -55,14 +55,18 @@ public sealed class RentalService(
         var motoboy = await GetMotoboyEntity(request.MotoboyIdentifier, validate, cancellationToken);
         var moto = await GetMotoEntity(request.MotoIdentifier, validate, cancellationToken);
 
-        if (await rentalRepository.CheckIdentifierExistsAsync(request.Identifier, cancellationToken))
+        var identifier = string.IsNullOrWhiteSpace(request.Identifier)
+            ? Guid.NewGuid().ToString("N")
+            : request.Identifier;
+
+        if (await rentalRepository.CheckIdentifierExistsAsync(identifier, cancellationToken))
             validate.Errors.Add(new ValidationFailure("identificador", "Identificador já cadastrado"));
 
         if (!validate.IsValid)
             return Result.Fail(validate.Errors.Select(x => x.ErrorMessage));
 
         var rentEntity = new RentalEntity(
-            request.Identifier,
+            identifier,
             motoboy!.Id,
             moto!.Id,
             DateOnly.FromDateTime(request.DateStart),

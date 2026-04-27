@@ -26,7 +26,11 @@ public sealed class MotoService(
         if (!validator.IsValid)
             return Result.Fail(validator.Errors.Select(x => x.ErrorMessage));
 
-        var moto = new MotoEntity(request.Identifier, request.Year, request.Model, request.Plate);
+        var moto = new MotoEntity(
+            string.IsNullOrWhiteSpace(request.Identifier) ? Guid.NewGuid().ToString("N") : request.Identifier,
+            request.Year,
+            request.Model,
+            request.Plate);
 
         if (await motoRepository.CheckIdentifierExistsAsync(moto.Identifier, cancellationToken))
             return Result.Fail("Identificador já cadastrado");

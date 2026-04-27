@@ -10,12 +10,13 @@ public static class CreateMotoboyCommandFaker
     {
         return new Faker<CreateMotoboyCommand>()
             .CustomInstantiator(faker => new CreateMotoboyCommand(
-                Identifier: faker.Random.AlphaNumeric(8),
                 Name: faker.Person.FullName,
                 Cnpj: faker.Company.Cnpj(),
+                Password: faker.Internet.Password(8),
                 DateBirth: faker.Person.DateOfBirth,
                 Cnh: "77058710884",
-                TypeCnh: faker.PickRandom("A", "B", "A+B")
+                TypeCnh: faker.PickRandom("A", "B", "A+B"),
+                Identifier: faker.Random.AlphaNumeric(8)
             ));
     }
 
@@ -23,9 +24,9 @@ public static class CreateMotoboyCommandFaker
     {
         return new Faker<CreateMotoboyCommand>()
             .CustomInstantiator(faker => new CreateMotoboyCommand(
-                Identifier: string.Empty,
                 Name: string.Empty,
                 Cnpj: faker.Random.AlphaNumeric(5),
+                Password: string.Empty,
                 DateBirth: DateTime.Now,
                 Cnh: faker.Random.AlphaNumeric(5),
                 TypeCnh: "Z"

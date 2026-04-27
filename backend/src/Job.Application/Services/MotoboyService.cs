@@ -17,7 +17,6 @@ public sealed class MotoboyService(
     IRequestHandler<UploadCnhMotoboyCommand, Result>
 {
     private const int WorkFactor = 12;
-    private const string DefaultPasswordSeed = "motoboy-default-password";
 
     public async Task<Result<MotoboyDto>> Handle(AuthenticationMotoboyCommand request,
         CancellationToken cancellationToken)
@@ -48,9 +47,9 @@ public sealed class MotoboyService(
         if (!TryParseCnh(request.TypeCnh, out var typeCnh))
             return Result.Fail("Tipo de cnh inválido");
 
-        var password = BCrypt.Net.BCrypt.HashPassword(DefaultPasswordSeed, WorkFactor);
+        var password = BCrypt.Net.BCrypt.HashPassword(request.Password, WorkFactor);
         var motoboyEntity = new MotoboyEntity(
-            request.Identifier,
+            string.IsNullOrWhiteSpace(request.Identifier) ? Guid.NewGuid().ToString("N") : request.Identifier,
             password,
             request.Name,
             request.Cnpj,

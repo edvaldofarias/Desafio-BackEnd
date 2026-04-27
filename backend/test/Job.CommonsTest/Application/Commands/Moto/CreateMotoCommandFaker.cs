@@ -9,10 +9,10 @@ public static class CreateMotoCommandFaker
     {
         return new Faker<CreateMotoCommand>()
             .CustomInstantiator(faker => new CreateMotoCommand(
-                Identifier: faker.Random.AlphaNumeric(8),
                 Year: faker.Random.Int(1901, 2050),
                 Model: $"{faker.Vehicle.Model()}-{faker.Random.AlphaNumeric(3)}",
-                Plate: "AAA5F55"
+                Plate: "AAA5F55",
+                Identifier: faker.Random.AlphaNumeric(8)
             ));
     }
 
@@ -20,10 +20,10 @@ public static class CreateMotoCommandFaker
     {
         return new Faker<CreateMotoCommand>()
             .CustomInstantiator(_ => new CreateMotoCommand(
-                Identifier: string.Empty,
                 Year: 0,
                 Model: string.Empty,
-                Plate: string.Empty
+                Plate: string.Empty,
+                Identifier: string.Empty
             ));
     }
 
@@ -31,10 +31,10 @@ public static class CreateMotoCommandFaker
     {
         return new Faker<CreateMotoCommand>()
             .CustomInstantiator(faker => new CreateMotoCommand(
-                Identifier: string.Empty,
                 Year: faker.Random.Int(0, 1899),
                 Model: string.Empty,
-                Plate: faker.Random.AlphaNumeric(1)
+                Plate: faker.Random.AlphaNumeric(1),
+                Identifier: string.Empty
             ));
     }
 }

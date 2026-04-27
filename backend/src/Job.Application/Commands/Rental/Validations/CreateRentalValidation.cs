@@ -4,10 +4,6 @@ public sealed class CreateRentalValidation : AbstractValidator<CreateRentalComma
 {
     public CreateRentalValidation()
     {
-        RuleFor(x => x.Identifier)
-            .NotEmpty()
-            .WithMessage("Identificador é obrigatório");
-
         RuleFor(x => x.MotoboyIdentifier)
             .NotEmpty()
             .WithMessage("Entregador é obrigatório");

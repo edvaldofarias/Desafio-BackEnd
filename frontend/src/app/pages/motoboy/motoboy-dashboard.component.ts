@@ -31,10 +31,6 @@ import { extractErrorMessage } from '../../core/error.util';
       <h2>Alugar moto</h2>
       <form (submit)="createRental($event)" class="row">
         <div>
-          <label for="rid">Identificador da locação</label>
-          <input id="rid" name="identificador" [(ngModel)]="rental.identificador" required />
-        </div>
-        <div>
           <label for="motoid">ID da moto</label>
           <input id="motoid" name="moto_id" [(ngModel)]="rental.moto_id" required />
         </div>
@@ -150,10 +146,10 @@ export class MotoboyDashboardComponent {
     };
 
     this.rentalApi.create(payload).subscribe({
-      next: () => {
+      next: created => {
         this.creatingRental.set(false);
         this.rentalCreated.set(true);
-        this.lookupId = payload.identificador;
+        this.lookupId = created.identificador;
         this.rental = this.emptyRental();
       },
       error: (err: HttpErrorResponse) => { this.creatingRental.set(false); this.rentalError.set(extractErrorMessage(err)); }
@@ -181,7 +177,6 @@ export class MotoboyDashboardComponent {
 
   private emptyRental(): CreateRental {
     return {
-      identificador: '',
       entregador_id: '',
       moto_id: '',
       data_inicio: '',

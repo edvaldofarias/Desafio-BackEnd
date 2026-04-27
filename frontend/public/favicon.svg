@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" role="img" aria-label="Mottu">
+  <rect width="200" height="200" rx="24" fill="#00CD3C"/>
+  <path d="M28 168 L28 52 L60 52 L100 110 L140 52 L172 52 L172 168 L142 168 L142 100 L100 158 L58 100 L58 168 Z"
+        fill="#FFFFFF"/>
+</svg>

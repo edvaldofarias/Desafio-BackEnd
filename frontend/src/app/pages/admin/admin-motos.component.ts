@@ -1,7 +1,7 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { HttpErrorResponse } from '@angular/common/http';
-import { Moto, MotoApi } from '../../core/api/moto.api';
+import { Moto, MotoApi, MotoResponse } from '../../core/api/moto.api';
 import { extractErrorMessage } from '../../core/error.util';
 
 @Component({
@@ -14,10 +14,6 @@ import { extractErrorMessage } from '../../core/error.util';
     <section class="card">
       <h2>Cadastrar moto</h2>
       <form (submit)="create($event)" class="row">
-        <div>
-          <label for="ident">Identificador</label>
-          <input id="ident" name="ident" [(ngModel)]="form.identificador" required />
-        </div>
         <div>
           <label for="ano">Ano</label>
           <input id="ano" name="ano" type="number" [(ngModel)]="form.ano" required />
@@ -80,7 +76,7 @@ import { extractErrorMessage } from '../../core/error.util';
 export class AdminMotosComponent implements OnInit {
   private api = inject(MotoApi);
 
-  protected motos = signal<Moto[]>([]);
+  protected motos = signal<MotoResponse[]>([]);
   protected creating = signal<boolean>(false);
   protected createError = signal<string | null>(null);
   protected createSuccess = signal<boolean>(false);
@@ -89,7 +85,7 @@ export class AdminMotosComponent implements OnInit {
 
   filter = '';
   newPlate = '';
-  form: Moto = { identificador: '', ano: new Date().getFullYear(), modelo: '', placa: '' };
+  form: Moto = { ano: new Date().getFullYear(), modelo: '', placa: '' };
 
   ngOnInit(): void { this.reload(); }
 
@@ -110,14 +106,14 @@ export class AdminMotosComponent implements OnInit {
       next: () => {
         this.creating.set(false);
         this.createSuccess.set(true);
-        this.form = { identificador: '', ano: new Date().getFullYear(), modelo: '', placa: '' };
+        this.form = { ano: new Date().getFullYear(), modelo: '', placa: '' };
         this.reload();
       },
       error: (err: HttpErrorResponse) => { this.creating.set(false); this.createError.set(extractErrorMessage(err)); }
     });
   }
 
-  startEdit(m: Moto): void { this.editingId.set(m.identificador); this.newPlate = m.placa; }
+  startEdit(m: MotoResponse): void { this.editingId.set(m.identificador); this.newPlate = m.placa; }
   savePlate(id: string): void {
     this.api.updatePlate(id, this.newPlate).subscribe({
       next: () => { this.editingId.set(null); this.reload(); },

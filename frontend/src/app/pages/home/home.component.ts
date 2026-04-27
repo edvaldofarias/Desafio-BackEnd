@@ -6,36 +6,43 @@ import { RouterLink } from '@angular/router';
   standalone: true,
   imports: [RouterLink],
   template: `
-    <section class="card hero">
-      <h1>Mottu — Aplicação de Teste</h1>
-      <p>
-        Esta é uma aplicação <strong>de teste</strong> que consome a API do desafio
-        backend Mottu. Selecione um perfil para entrar ou se cadastrar.
+    <section class="card bg-gradient-to-br from-ink-900 to-ink-800 text-white border-0 ring-0">
+      <div class="flex items-center gap-4">
+        <img src="mottu-logo.svg" alt="Mottu" class="h-14 w-14 rounded-lg shadow-md" />
+        <div>
+          <p class="text-xs uppercase tracking-widest text-brand-200">Aplicação de teste</p>
+          <h1 class="!text-white text-3xl mt-1">Mottu — Desafio Backend</h1>
+        </div>
+      </div>
+      <p class="mt-4 text-slate-200 max-w-xl">
+        Frontend de teste para o desafio. Selecione um perfil para entrar ou se cadastrar.
       </p>
     </section>
 
-    <div class="profiles">
-      <article class="card profile">
-        <h2>Admin</h2>
-        <p>Gerencie motos: cadastrar, listar, alterar placa e remover.</p>
-        <a class="btn" routerLink="/admin/login">Entrar como admin</a>
+    <div class="grid gap-5 md:grid-cols-2">
+      <article class="card flex flex-col gap-3 hover:shadow-md transition-shadow">
+        <div class="flex items-center gap-3">
+          <span class="text-2xl">🛠️</span>
+          <h2>Admin</h2>
+        </div>
+        <p class="text-sm text-slate-600">Gerencie motos: cadastrar, listar, alterar placa e remover.</p>
+        <div class="mt-auto pt-2">
+          <a class="btn" routerLink="/admin/login">Entrar como admin</a>
+        </div>
       </article>
 
-      <article class="card profile">
-        <h2>Entregador</h2>
-        <p>Cadastre-se, envie sua CNH e alugue uma moto disponível.</p>
-        <a class="btn" routerLink="/motoboy/login">Entrar como entregador</a>
-        <a class="btn btn-link" routerLink="/motoboy/cadastro">ou cadastre-se</a>
+      <article class="card flex flex-col gap-3 hover:shadow-md transition-shadow">
+        <div class="flex items-center gap-3">
+          <span class="text-2xl">🛵</span>
+          <h2>Entregador</h2>
+        </div>
+        <p class="text-sm text-slate-600">Cadastre-se, envie sua CNH e alugue uma moto disponível.</p>
+        <div class="mt-auto pt-2 flex gap-2">
+          <a class="btn" routerLink="/motoboy/login">Entrar</a>
+          <a class="btn btn-link" routerLink="/motoboy/cadastro">Cadastrar-se</a>
+        </div>
       </article>
     </div>
-  `,
-  styles: [`
-    .hero { background: linear-gradient(135deg, #0d2540, #1976d2); color: #fff; }
-    .hero h1 { margin: 0 0 0.6rem; }
-    .profiles { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; }
-    .profile { display: flex; flex-direction: column; gap: 0.5rem; align-items: flex-start; }
-    .profile h2 { margin: 0; }
-    @media (max-width: 640px) { .profiles { grid-template-columns: 1fr; } }
-  `]
+  `
 })
 export class HomeComponent {}
