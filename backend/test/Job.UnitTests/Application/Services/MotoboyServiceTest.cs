@@ -76,7 +76,7 @@ public class MotoboyServiceTest
     public async Task Create_WhenIdentifierExists_ShouldFail()
     {
         var command = CreateMotoboyCommandFaker.Default().Generate();
-        _repository.Setup(x => x.CheckIdentifierExistsAsync(command.Identifier, _cancellationToken))
+        _repository.Setup(x => x.CheckIdentifierExistsAsync(command.Identifier!, _cancellationToken))
             .ReturnsAsync(true);
 
         var response = await _motoboyService.Handle(command, _cancellationToken);

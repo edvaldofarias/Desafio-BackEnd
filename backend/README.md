@@ -1,3 +1,195 @@
+# Backend — Desafio Mottu
+
+API REST em **.NET 10 / ASP.NET Core** para o desafio de aluguel de motos.
+O contrato segue o Swagger oficial (campos em `snake_case`, identificadores
+como `string`, erros como `{ "mensagem": "..." }`).
+
+> Para a visão geral do projeto (frontend + docker compose + arquitetura),
+> veja o [README na raiz](../README.md).
+
+## Stack & libs
+
+| Categoria          | Lib                                                                                  |
+|--------------------|---------------------------------------------------------------------------------------|
+| Runtime            | .NET 10 / C# 13                                                                       |
+| ORM                | EF Core 10 + Npgsql                                                                   |
+| Mensageria         | RabbitMQ.Client + `BackgroundService`                                                 |
+| Validação          | FluentValidation                                                                      |
+| Result/CQRS        | FluentResults + MediatR                                                               |
+| Auth               | JWT Bearer + BCrypt.Net-Next                                                           |
+| Documentação       | Swashbuckle (Swagger UI)                                                              |
+| Testes             | xUnit, FluentAssertions, Moq, NetArchTest, Bogus, `Xunit.SkippableFact`, `Mvc.Testing` |
+
+## Padrões de projeto aplicados
+
+- **Clean Architecture leve** com 4 projetos (Domain → Application →
+  Infrastructure → WebApi).
+- **CQRS-lite com MediatR** — cada caso de uso é um `Command` + `Handler`.
+- **Result pattern** (`FluentResults`) para erros tipados; `400/404` no
+  controller a partir de `Result.Fail(...)`.
+- **Repository pattern** — interfaces em `Job.Application/Repositories`,
+  implementações em `Job.Infrastructure/Repositories`.
+- **Validation** isolada por comando (`FluentValidation`).
+- **Outbox simplificado** — handler publica `MotoCreatedEvent`; consumer
+  filtra `Year == 2024` e persiste em `MotoNotifications`.
+- **Auto-geração de identificadores** — todos os `Identifier` são opcionais;
+  quando o cliente não envia, o handler gera `Guid.NewGuid().ToString("N")`.
+
+## Como executar
+
+### Via Docker (recomendado)
+
+```bash
+# este diretório (apenas backend + Postgres + RabbitMQ)
+docker compose up -d --build
+```
+
+| Serviço      | URL                                       |
+|--------------|-------------------------------------------|
+| API          | http://localhost:5001/swagger             |
+| PostgreSQL   | localhost:5432 (`postgres` / `postgres`)  |
+| RabbitMQ UI  | http://localhost:15672 (`guest`/`guest`)  |
+
+> Para subir junto com o front-end, use o `docker-compose.yml` da **raiz** do
+> repositório.
+
+### Local (sem Docker para a API)
+
+```bash
+docker compose up -d postgres rabbitmq      # apenas dependências
+dotnet run --project src/Job.WebApi         # http://localhost:5050
+```
+
+A API roda automaticamente as migrations no boot e cria/atualiza o schema.
+Imagens da CNH são salvas em volume Docker (`uploads-data`) e expostas em
+`/uploads/<arquivo>`.
+
+## Configurações principais
+
+`appsettings.json` (sobrescrevíveis via env, formato `Section__Key`):
+
+```jsonc
+{
+  "ConnectionStrings": {
+    "DefaultConnection": "Server=postgres;Port=5432;User Id=postgres;Password=postgres;Database=job;"
+  },
+  "Jwt":      { "Secret": "<segredo-de-32-ou-mais-chars>" },
+  "Storage":  { "RootPath": "uploads", "PublicBaseUrl": "/uploads" },
+  "RabbitMq": {
+    "HostName": "rabbitmq",
+    "Port": 5672,
+    "UserName": "guest",
+    "Password": "guest",
+    "MotoCreatedExchange": "moto.created",
+    "MotoCreatedQueue":    "moto.created.year-2024"
+  },
+  "Cors": { "AllowedOrigins": [ "http://localhost:4200" ] }
+}
+```
+
+Em produção, sobrescreva via env: `Jwt__Secret`, `RabbitMq__Password`,
+`ConnectionStrings__DefaultConnection`, `Cors__AllowedOrigins__0`, etc.
+
+## Endpoints (resumo)
+
+Todos em `snake_case`. Erros: `{ "mensagem": "..." }`.
+
+### `/motos` (admin)
+
+| Método | Rota                  | Descrição                                                                |
+|--------|-----------------------|--------------------------------------------------------------------------|
+| POST   | `/motos`              | Cadastra moto (`identificador` opcional — gerado se omitido)             |
+| GET    | `/motos?placa=`       | Lista motos (filtro opcional por placa)                                  |
+| GET    | `/motos/{id}`         | Busca moto por identificador                                             |
+| PUT    | `/motos/{id}/placa`   | Atualiza apenas a placa                                                  |
+| DELETE | `/motos/{id}`         | Remove moto sem locações                                                 |
+
+```json
+POST /motos
+{ "ano": 2024, "modelo": "Mottu Sport", "placa": "CDX-0101" }
+```
+
+### `/entregadores`
+
+| Método | Rota                              | Descrição                                       |
+|--------|-----------------------------------|-------------------------------------------------|
+| POST   | `/entregadores`                   | Cadastro (exige `senha` ≥ 6 chars)              |
+| POST   | `/entregadores/{id}/cnh`          | Atualiza imagem da CNH (base64 png/bmp)         |
+| POST   | `/entregadores/authentication`    | Login do entregador → JWT                       |
+
+```json
+POST /entregadores
+{
+  "nome": "João Entregador",
+  "cnpj": "12345678000195",
+  "senha": "minha-senha-forte",
+  "data_nascimento": "1990-01-01",
+  "numero_cnh": "77058710884",
+  "tipo_cnh": "A"
+}
+```
+
+### `/locacao`
+
+| Método | Rota                          | Descrição                                  |
+|--------|-------------------------------|--------------------------------------------|
+| POST   | `/locacao`                    | Aluga moto (planos 7 / 15 / 30 / 45 / 50)  |
+| GET    | `/locacao/{id}`               | Consulta locação                           |
+| PUT    | `/locacao/{id}/devolucao`     | Informa devolução, calcula multa/total     |
+
+Regras:
+
+- Diárias: 7 = R$ 30 · 15 = R$ 28 · 30 = R$ 22 · 45 = R$ 20 · 50 = R$ 18.
+- Devolução **antes** da previsão → cobra dias usados + multa (20% no plano
+  de 7, 40% nos demais sobre as diárias não usadas).
+- Devolução **depois** da previsão → cobra todas as diárias do plano +
+  R$ 50,00 por dia adicional.
+- Apenas entregador com CNH `A` ou `A+B` pode alugar.
+
+### `/manager`
+
+| Método | Rota                      | Descrição           |
+|--------|---------------------------|---------------------|
+| POST   | `/manager/authentication` | Login admin (JWT)   |
+
+Credenciais semeadas: `job@job.com` / `mudar@123`.
+
+## Mensageria
+
+Ao cadastrar uma moto a API publica `MotoCreatedEvent` na exchange
+`moto.created`. O `MotoNotificationConsumer` (BackgroundService) consome a
+fila `moto.created.year-2024`, filtra eventos cujo `Year == 2024` e persiste
+a notificação na tabela `MotoNotifications`.
+
+## Testes
+
+```bash
+dotnet test Job.slnx --nologo
+```
+
+- `Job.UnitTests` — handlers e regras puras.
+- `Job.ArchitectureTest` — fronteiras Domain/Application/Infrastructure/WebApi.
+- `Job.IntegrationTest` — `WebApplicationFactory` + `SkippableFact` (sobe se
+  houver Postgres + RabbitMQ; senão, pula graciosamente).
+- `Job.CommonsTest` — fakers Bogus reutilizáveis.
+
+## Estrutura
+
+```
+backend/
+├── docker-compose.yml          # API + Postgres + RabbitMQ
+├── Job.slnx                    # solution moderna .NET 10
+├── src/
+│   ├── Job.Domain              # entidades, enums, regras puras
+│   ├── Job.Application         # commands, validations, services (handlers)
+│   ├── Job.Infrastructure      # EF Core, repositórios, RabbitMQ, storage
+│   └── Job.WebApi              # controllers, Program.cs, middlewares, Dockerfile
+└── test/
+    ├── Job.UnitTests
+    ├── Job.ArchitectureTest
+    ├── Job.IntegrationTest
+    └── Job.CommonsTest
+```
 # Desafio Backend — Mottu
 
 Projeto desenvolvido durante o processo seletivo, implementando uma API REST

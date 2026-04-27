@@ -39,7 +39,7 @@ public sealed class MotoServiceTest
     public async Task CreateAsync_WhenIdentifierExists_ShouldFail()
     {
         var command = CreateMotoCommandFaker.Default().Generate();
-        _motoRepository.Setup(x => x.CheckIdentifierExistsAsync(command.Identifier, _cancellationToken))
+        _motoRepository.Setup(x => x.CheckIdentifierExistsAsync(command.Identifier!, _cancellationToken))
             .ReturnsAsync(true);
 
         var response = await _motoService.Handle(command, _cancellationToken);

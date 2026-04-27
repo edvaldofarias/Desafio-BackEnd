@@ -1,0 +1,108 @@
+# Compose orquestrador na raiz do repositório.
+# Sobe Postgres, RabbitMQ, API .NET e Front-end Angular (Nginx).
+#
+# Uso:
+#   docker compose up -d --build       # sobe tudo
+#   docker compose logs -f core-webapi # logs da API
+#   docker compose down -v             # derruba e apaga volumes
+#
+# URLs:
+#   Frontend (SPA + proxy /api):  http://localhost:4200
+#   API direta (Swagger):          http://localhost:5001/swagger
+#   RabbitMQ Management:           http://localhost:15672  (guest/guest)
+#   Postgres:                       localhost:5432         (postgres/postgres)
+
+services:
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: mottu-postgres
+    ports:
+      - '5432:5432'
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: job
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - mottu-network
+    restart: unless-stopped
+    healthcheck:
+      test: ['CMD', 'pg_isready', '-U', 'postgres']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  rabbitmq:
+    image: rabbitmq:3.13-management-alpine
+    container_name: mottu-rabbitmq
+    ports:
+      - '5672:5672'    # AMQP
+      - '15672:15672'  # Management UI
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
+    networks:
+      - mottu-network
+    restart: unless-stopped
+    healthcheck:
+      test: ['CMD', 'rabbitmq-diagnostics', 'check_running']
+      interval: 15s
+      timeout: 10s
+      retries: 5
+
+  core-webapi:
+    build:
+      context: ./backend
+      dockerfile: ./src/Job.WebApi/Dockerfile
+    image: mottu/core-webapi:latest
+    container_name: mottu-webapi
+    user: app
+    ports:
+      - '5001:8080'
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://+:8080
+      ConnectionStrings__DefaultConnection: 'Server=postgres;Port=5432;User Id=postgres;Password=postgres;Database=job;'
+      RabbitMq__HostName: rabbitmq
+      RabbitMq__Port: '5672'
+      RabbitMq__UserName: guest
+      RabbitMq__Password: guest
+      Cors__AllowedOrigins__0: http://localhost:4200
+      Cors__AllowedOrigins__1: http://frontend
+    volumes:
+      - uploads-data:/app/uploads
+    networks:
+      - mottu-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    image: mottu/frontend:latest
+    container_name: mottu-frontend
+    ports:
+      - '4200:80'
+    networks:
+      - mottu-network
+    depends_on:
+      - core-webapi
+    restart: unless-stopped
+
+volumes:
+  postgres-data:
+  rabbitmq-data:
+  uploads-data:
+
+networks:
+  mottu-network:
+    driver: bridge

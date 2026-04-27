@@ -80,8 +80,10 @@ builder.Services.AddSingleton<ITokenService, TokenService>();
 
 builder.Services.AddCors(options =>
 {
+    var allowed = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>()
+                  ?? new[] { "http://localhost:4200" };
     options.AddDefaultPolicy(policy =>
-        policy.WithOrigins("http://localhost:4200")
+        policy.WithOrigins(allowed)
               .AllowAnyHeader()
               .AllowAnyMethod());
 });
