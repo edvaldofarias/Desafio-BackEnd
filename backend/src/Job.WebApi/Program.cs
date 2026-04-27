@@ -78,6 +78,14 @@ builder.Services.AddAuthorization(options =>
 
 builder.Services.AddSingleton<ITokenService, TokenService>();
 
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(policy =>
+        policy.WithOrigins("http://localhost:4200")
+              .AllowAnyHeader()
+              .AllowAnyMethod());
+});
+
 var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
@@ -106,6 +114,8 @@ app.UseStaticFiles(new StaticFileOptions
     FileProvider = new PhysicalFileProvider(uploadsRoot),
     RequestPath = storageOptions.PublicBaseUrl.StartsWith('/') ? storageOptions.PublicBaseUrl : "/" + storageOptions.PublicBaseUrl,
 });
+
+app.UseCors();
 
 app.UseAuthentication();
 app.UseAuthorization();
