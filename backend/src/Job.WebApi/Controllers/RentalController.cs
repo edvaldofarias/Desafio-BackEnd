@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Job.WebApi.Controllers;
 
 [Route("locacao")]
-[AllowAnonymous]
+[Authorize(Roles = "entregador")]
 public sealed class RentalController(IMediator mediator) : BaseController
 {
     [HttpPost]

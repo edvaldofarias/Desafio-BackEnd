@@ -66,9 +66,9 @@ public class MotoboyControllerTest(SetupFactory factory) : IClassFixture<SetupFa
     {
         Skip.IfNot(factory.Db.IsAvailable, factory.Db.UnavailableReason);
 
-        var client = factory.CreateClient();
+        var anonClient = factory.CreateClient();
         var identifier = $"entregador-{Guid.NewGuid():N}";
-        await client.PostAsJsonAsync("/entregadores", new
+        await anonClient.PostAsJsonAsync("/entregadores", new
         {
             identificador = identifier,
             nome = _faker.Person.FullName,
@@ -79,6 +79,7 @@ public class MotoboyControllerTest(SetupFactory factory) : IClassFixture<SetupFa
             imagem_cnh = (string?)null,
         });
 
+        var client = factory.CreateClient().WithMotoboyAuth();
         var response = await client.PostAsJsonAsync(
             $"/entregadores/{identifier}/cnh",
             new { imagem_cnh = PngBase64 });

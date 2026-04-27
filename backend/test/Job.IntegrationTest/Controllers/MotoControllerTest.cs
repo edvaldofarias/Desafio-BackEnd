@@ -14,7 +14,7 @@ public class MotoControllerTest(SetupFactory factory) : IClassFixture<SetupFacto
     {
         Skip.IfNot(factory.Db.IsAvailable, factory.Db.UnavailableReason);
 
-        var client = factory.CreateClient();
+        var client = factory.CreateClient().WithAdminAuth();
         var identifier = $"moto-{Guid.NewGuid():N}";
         var payload = new
         {
@@ -34,7 +34,7 @@ public class MotoControllerTest(SetupFactory factory) : IClassFixture<SetupFacto
     {
         Skip.IfNot(factory.Db.IsAvailable, factory.Db.UnavailableReason);
 
-        var client = factory.CreateClient();
+        var client = factory.CreateClient().WithAdminAuth();
         var payload = new
         {
             identificador = $"moto-{Guid.NewGuid():N}",
@@ -56,7 +56,7 @@ public class MotoControllerTest(SetupFactory factory) : IClassFixture<SetupFacto
     {
         Skip.IfNot(factory.Db.IsAvailable, factory.Db.UnavailableReason);
 
-        var client = factory.CreateClient();
+        var client = factory.CreateClient().WithAdminAuth();
         var identifier = $"moto-{Guid.NewGuid():N}";
         var plate = $"BBB{_faker.Random.Number(1000, 9999)}";
         await client.PostAsJsonAsync("/motos", new
@@ -81,7 +81,7 @@ public class MotoControllerTest(SetupFactory factory) : IClassFixture<SetupFacto
     {
         Skip.IfNot(factory.Db.IsAvailable, factory.Db.UnavailableReason);
 
-        var client = factory.CreateClient();
+        var client = factory.CreateClient().WithAdminAuth();
         var response = await client.GetAsync($"/motos/{Guid.NewGuid():N}");
 
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
@@ -95,7 +95,7 @@ public class MotoControllerTest(SetupFactory factory) : IClassFixture<SetupFacto
     {
         Skip.IfNot(factory.Db.IsAvailable, factory.Db.UnavailableReason);
 
-        var client = factory.CreateClient();
+        var client = factory.CreateClient().WithAdminAuth();
         var identifier = $"moto-{Guid.NewGuid():N}";
         await client.PostAsJsonAsync("/motos", new
         {
@@ -121,7 +121,7 @@ public class MotoControllerTest(SetupFactory factory) : IClassFixture<SetupFacto
     {
         Skip.IfNot(factory.Db.IsAvailable, factory.Db.UnavailableReason);
 
-        var client = factory.CreateClient();
+        var client = factory.CreateClient().WithAdminAuth();
         var identifier = $"moto-{Guid.NewGuid():N}";
         await client.PostAsJsonAsync("/motos", new
         {

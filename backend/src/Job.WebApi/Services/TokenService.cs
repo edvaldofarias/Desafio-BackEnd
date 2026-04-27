@@ -1,15 +1,20 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Text;
 using Microsoft.IdentityModel.Tokens;
 
 namespace Job.WebApi.Services;
 
-public static class TokenService
+public sealed class TokenService(IConfiguration configuration) : ITokenService
 {
-    public static string GenerateToken(string name, string role)
+    public string GenerateToken(string name, string role)
     {
+        var secret = configuration["Jwt:Secret"]
+            ?? throw new InvalidOperationException("Configuração 'Jwt:Secret' não definida.");
+
         var tokenHandler = new JwtSecurityTokenHandler();
-        var key = "b2e523160e5740e49ec7885759dbb657"u8.ToArray();
+        tokenHandler.OutboundClaimTypeMap.Clear();
+        var key = Encoding.UTF8.GetBytes(secret);
         var claims = new List<Claim>
         {
             new(ClaimTypes.Name, name),

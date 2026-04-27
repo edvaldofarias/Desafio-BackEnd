@@ -12,8 +12,9 @@ public class RentalControllerTest(SetupFactory factory) : IClassFixture<SetupFac
 
     private async Task<string> CreateMotoAsync(HttpClient client)
     {
+        var admin = factory.CreateClient().WithAdminAuth();
         var identifier = $"moto-{Guid.NewGuid():N}";
-        var resp = await client.PostAsJsonAsync("/motos", new
+        var resp = await admin.PostAsJsonAsync("/motos", new
         {
             identificador = identifier,
             ano = 2024,
@@ -26,8 +27,9 @@ public class RentalControllerTest(SetupFactory factory) : IClassFixture<SetupFac
 
     private async Task<string> CreateMotoboyAsync(HttpClient client, string typeCnh = "A")
     {
+        var anon = factory.CreateClient();
         var identifier = $"entregador-{Guid.NewGuid():N}";
-        var resp = await client.PostAsJsonAsync("/entregadores", new
+        var resp = await anon.PostAsJsonAsync("/entregadores", new
         {
             identificador = identifier,
             nome = _faker.Person.FullName,
@@ -46,7 +48,7 @@ public class RentalControllerTest(SetupFactory factory) : IClassFixture<SetupFac
     {
         Skip.IfNot(factory.Db.IsAvailable, factory.Db.UnavailableReason);
 
-        var client = factory.CreateClient();
+        var client = factory.CreateClient().WithMotoboyAuth();
         var moto = await CreateMotoAsync(client);
         var motoboy = await CreateMotoboyAsync(client, "A");
         var rentalId = $"locacao-{Guid.NewGuid():N}";
@@ -73,7 +75,7 @@ public class RentalControllerTest(SetupFactory factory) : IClassFixture<SetupFac
     {
         Skip.IfNot(factory.Db.IsAvailable, factory.Db.UnavailableReason);
 
-        var client = factory.CreateClient();
+        var client = factory.CreateClient().WithMotoboyAuth();
         var moto = await CreateMotoAsync(client);
         var motoboy = await CreateMotoboyAsync(client, "B");
         var start = DateTime.UtcNow.Date.AddDays(1);
@@ -102,7 +104,7 @@ public class RentalControllerTest(SetupFactory factory) : IClassFixture<SetupFac
     {
         Skip.IfNot(factory.Db.IsAvailable, factory.Db.UnavailableReason);
 
-        var client = factory.CreateClient();
+        var client = factory.CreateClient().WithMotoboyAuth();
         var moto = await CreateMotoAsync(client);
         var motoboy = await CreateMotoboyAsync(client, "A");
         var rentalId = $"locacao-{Guid.NewGuid():N}";
@@ -132,7 +134,7 @@ public class RentalControllerTest(SetupFactory factory) : IClassFixture<SetupFac
     {
         Skip.IfNot(factory.Db.IsAvailable, factory.Db.UnavailableReason);
 
-        var client = factory.CreateClient();
+        var client = factory.CreateClient().WithMotoboyAuth();
         var moto = await CreateMotoAsync(client);
         var motoboy = await CreateMotoboyAsync(client, "A");
         var rentalId = $"locacao-{Guid.NewGuid():N}";

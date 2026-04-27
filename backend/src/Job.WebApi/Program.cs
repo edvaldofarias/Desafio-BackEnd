@@ -1,7 +1,9 @@
 using Job.Infrastructure.Context;
 using Job.Infrastructure.Storage;
 using Job.WebApi.Infrastructure;
+using Job.WebApi.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
@@ -45,23 +47,36 @@ builder.Services.AddSwaggerGen(c =>
 var configuration = builder.Configuration;
 builder.Services.AddDependencyInject(configuration);
 
-var jwtSecret = configuration["Jwt:Secret"]
-    ?? throw new InvalidOperationException("Configuração 'Jwt:Secret' não definida.");
-
 builder.Services.AddAuthentication(x =>
 {
     x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
     x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-}).AddJwtBearer(x =>
-{
-    x.TokenValidationParameters = new TokenValidationParameters
+}).AddJwtBearer();
+
+builder.Services.AddOptions<JwtBearerOptions>(JwtBearerDefaults.AuthenticationScheme)
+    .Configure<IConfiguration>((options, config) =>
     {
-        ValidateIssuerSigningKey = true,
-        ValidateAudience = false,
-        IssuerSigningKey = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(jwtSecret)),
-        ValidateIssuer = false
-    };
+        var secret = config["Jwt:Secret"]
+            ?? throw new InvalidOperationException("Configuração 'Jwt:Secret' não definida.");
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuerSigningKey = true,
+            ValidateAudience = false,
+            IssuerSigningKey = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(secret)),
+            ValidateIssuer = false,
+            NameClaimType = System.Security.Claims.ClaimTypes.Name,
+            RoleClaimType = System.Security.Claims.ClaimTypes.Role
+        };
+    });
+
+builder.Services.AddAuthorization(options =>
+{
+    options.FallbackPolicy = new AuthorizationPolicyBuilder()
+        .RequireAuthenticatedUser()
+        .Build();
 });
+
+builder.Services.AddSingleton<ITokenService, TokenService>();
 
 var app = builder.Build();
 

@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Job.WebApi.Controllers;
 
 [Route("motos")]
-[AllowAnonymous]
+[Authorize(Roles = "admin")]
 public sealed class MotoController(IMediator mediator) : BaseController
 {
     [HttpPost]

@@ -40,7 +40,7 @@ public class MotoMessagingTest(SetupFactory factory) : IClassFixture<SetupFactor
         Skip.IfNot(factory.Db.IsAvailable, factory.Db.UnavailableReason);
         Skip.IfNot(factory.Rabbit.IsAvailable, factory.Rabbit.UnavailableReason);
 
-        var client = factory.CreateClient();
+        var client = factory.CreateClient().WithAdminAuth();
         var plate = $"RBT{_faker.Random.Number(10000, 99999)}";
         var payload = new
         {
@@ -66,7 +66,7 @@ public class MotoMessagingTest(SetupFactory factory) : IClassFixture<SetupFactor
         Skip.IfNot(factory.Db.IsAvailable, factory.Db.UnavailableReason);
         Skip.IfNot(factory.Rabbit.IsAvailable, factory.Rabbit.UnavailableReason);
 
-        var client = factory.CreateClient();
+        var client = factory.CreateClient().WithAdminAuth();
         var plate = $"IGN{_faker.Random.Number(10000, 99999)}";
         var payload = new
         {

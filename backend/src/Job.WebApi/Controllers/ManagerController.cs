@@ -8,12 +8,13 @@ using Microsoft.AspNetCore.Mvc;
 namespace Job.WebApi.Controllers;
 
 [Route("Manager")]
-[AllowAnonymous]
 public class ManagerController(
     ILogger<ManagerController> logger,
-    IMediator mediator) : BaseController
+    IMediator mediator,
+    ITokenService tokenService) : BaseController
 {
     [HttpPost("Authentication")]
+    [AllowAnonymous]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -29,7 +30,7 @@ public class ManagerController(
         if (response.ValueOrDefault is null) return Unauthorized();
 
         var query = response.Value;
-        var token = TokenService.GenerateToken(query.Email, "admin");
+        var token = tokenService.GenerateToken(query.Email, "admin");
         return Ok(new
         {
             token,
