@@ -10,8 +10,8 @@ public static class CreateMotoCommandFaker
         return new Faker<CreateMotoCommand>()
             .CustomInstantiator(faker => new CreateMotoCommand(
                 Identifier: faker.Random.AlphaNumeric(8),
-                Year: faker.Random.Int(1900, 2050),
-                Model: faker.Vehicle.Model(),
+                Year: faker.Random.Int(1901, 2050),
+                Model: $"{faker.Vehicle.Model()}-{faker.Random.AlphaNumeric(3)}",
                 Plate: "AAA5F55"
             ));
     }
