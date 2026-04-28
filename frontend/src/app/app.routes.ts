@@ -18,6 +18,11 @@ export const routes: Routes = [
     canActivate: [roleGuard('entregador')],
     loadComponent: () => import('./pages/motoboy/motoboy-dashboard.component').then(m => m.MotoboyDashboardComponent)
   },
+  {
+    path: 'motoboy/atualizacao-cadastral',
+    canActivate: [roleGuard('entregador')],
+    loadComponent: () => import('./pages/motoboy/motoboy-profile-update.component').then(m => m.MotoboyProfileUpdateComponent)
+  },
 
   { path: '**', redirectTo: '' }
 ];

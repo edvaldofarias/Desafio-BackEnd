@@ -19,7 +19,17 @@ public sealed class RentalController(IMediator mediator) : BaseController
         var result = await mediator.Send(command, cancellationToken);
         if (result.IsFailed)
             return result.ToMensagemActionResult();
-        return StatusCode(StatusCodes.Status201Created);
+        return StatusCode(StatusCodes.Status201Created, result.Value);
+    }
+
+    [HttpGet]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> GetAllByMotoboy([FromQuery(Name = "entregador_id")] string motoboyId,
+        CancellationToken cancellationToken)
+    {
+        var result = await mediator.Send(new GetAllRentalCommand(motoboyId), cancellationToken);
+        return result.ToMensagemActionResult();
     }
 
     [HttpGet("{id}")]

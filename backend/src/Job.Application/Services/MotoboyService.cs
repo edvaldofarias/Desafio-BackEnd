@@ -17,6 +17,7 @@ public sealed class MotoboyService(
     IRequestHandler<UploadCnhMotoboyCommand, Result>
 {
     private const int WorkFactor = 12;
+    private const int MaxCnhImageBytes = 1024 * 1024;
 
     public async Task<Result<MotoboyDto>> Handle(AuthenticationMotoboyCommand request,
         CancellationToken cancellationToken)
@@ -105,7 +106,9 @@ public sealed class MotoboyService(
         {
             var (extension, bytes) = DecodeBase64Image(base64);
             if (extension is null)
-                return Result.Fail("Tipo de arquivo inválido (apenas png ou bmp)");
+                return Result.Fail("Tipo de arquivo inválido (apenas png, bmp, jpg ou jpeg)");
+            if (bytes.Length > MaxCnhImageBytes)
+                return Result.Fail("Arquivo muito grande. O limite permitido e de 1 MB.");
 
             using var stream = new MemoryStream(bytes);
             var path = await fileStorageService.SaveAsync($"cnh{extension}", stream, cancellationToken);
@@ -137,6 +140,7 @@ public sealed class MotoboyService(
 
             if (meta.Contains("image/png", StringComparison.OrdinalIgnoreCase)) extension = ".png";
             else if (meta.Contains("image/bmp", StringComparison.OrdinalIgnoreCase)) extension = ".bmp";
+            else if (meta.Contains("image/jpeg", StringComparison.OrdinalIgnoreCase) || meta.Contains("image/jpg", StringComparison.OrdinalIgnoreCase)) extension = ".jpg";
             else return (null, Array.Empty<byte>());
         }
 
@@ -148,6 +152,8 @@ public sealed class MotoboyService(
                 extension = ".png";
             else if (bytes.Length >= 2 && bytes[0] == 0x42 && bytes[1] == 0x4D)
                 extension = ".bmp";
+            else if (bytes.Length >= 3 && bytes[0] == 0xFF && bytes[1] == 0xD8 && bytes[2] == 0xFF)
+                extension = ".jpg";
             else
                 return (null, bytes);
         }

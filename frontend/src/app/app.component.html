@@ -10,6 +10,9 @@
         <span class="px-2 py-0.5 rounded-full bg-brand-50 text-brand-700 font-medium uppercase tracking-wide mr-2">{{ auth.role() }}</span>
         {{ auth.displayName() }}
       </span>
+      @if (auth.role() === 'entregador') {
+        <a routerLink="/motoboy/atualizacao-cadastral" class="btn btn-secondary !py-1.5 !px-3 text-xs">Atualizacao cadastral</a>
+      }
       <button type="button" class="btn btn-secondary !py-1.5 !px-3 text-xs" (click)="logout()">Sair</button>
     }
   </div>

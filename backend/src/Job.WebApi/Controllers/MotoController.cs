@@ -7,10 +7,11 @@ using Microsoft.AspNetCore.Mvc;
 namespace Job.WebApi.Controllers;
 
 [Route("motos")]
-[Authorize(Roles = "admin")]
+[Authorize]
 public sealed class MotoController(IMediator mediator) : BaseController
 {
     [HttpPost]
+    [Authorize(Roles = "admin")]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Create([FromBody] CreateMotoCommand command, CancellationToken cancellationToken)
@@ -20,6 +21,7 @@ public sealed class MotoController(IMediator mediator) : BaseController
     }
 
     [HttpGet]
+    [Authorize(Roles = "admin,entregador")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<IActionResult> GetAll([FromQuery(Name = "placa")] string? placa, CancellationToken cancellationToken)
     {
@@ -28,6 +30,7 @@ public sealed class MotoController(IMediator mediator) : BaseController
     }
 
     [HttpGet("{id}")]
+    [Authorize(Roles = "admin,entregador")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetById([FromRoute] string id, CancellationToken cancellationToken)
@@ -37,6 +40,7 @@ public sealed class MotoController(IMediator mediator) : BaseController
     }
 
     [HttpPut("{id}/placa")]
+    [Authorize(Roles = "admin")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> UpdatePlate([FromRoute] string id, [FromBody] UpdatePlateRequest body, CancellationToken cancellationToken)
@@ -46,6 +50,7 @@ public sealed class MotoController(IMediator mediator) : BaseController
     }
 
     [HttpDelete("{id}")]
+    [Authorize(Roles = "admin")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Delete([FromRoute] string id, CancellationToken cancellationToken)

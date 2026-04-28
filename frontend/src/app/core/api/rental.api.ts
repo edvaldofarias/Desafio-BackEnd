@@ -20,6 +20,8 @@ export interface Rental {
   valor_diaria: number;
   entregador_id: string;
   moto_id: string;
+  moto_modelo?: string;
+  moto_placa?: string;
   data_inicio: string;
   data_termino: string;
   data_previsao_termino: string;
@@ -34,6 +36,9 @@ export class RentalApi {
   private base = `${environment.apiUrl}/locacao`;
 
   create(body: CreateRental): Observable<Rental> { return this.http.post<Rental>(this.base, body); }
+  listByMotoboy(motoboyId: string): Observable<Rental[]> {
+    return this.http.get<Rental[]>(`${this.base}?entregador_id=${encodeURIComponent(motoboyId)}`);
+  }
   get(id: string): Observable<Rental> { return this.http.get<Rental>(`${this.base}/${id}`); }
   return(id: string, dataDevolucao: string): Observable<unknown> {
     return this.http.put(`${this.base}/${id}/devolucao`, { data_devolucao: dataDevolucao });

@@ -8,6 +8,7 @@ public interface IRentalRepository
 
     Task<RentalEntity?> GetByIdAsync(Guid id, CancellationToken cancellationToken);
     Task<RentalEntity?> GetByIdentifierAsync(string identifier, CancellationToken cancellationToken);
+    Task<IEnumerable<RentalEntity>> GetAllByMotoboyIdAsync(Guid motoboyId, CancellationToken cancellationToken);
 
     Task<RentalEntity?> GetByMotoIdAsync(Guid id, CancellationToken cancellationToken);
 

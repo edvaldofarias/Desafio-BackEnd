@@ -159,4 +159,35 @@ public class RentalControllerTest(SetupFactory factory) : IClassFixture<SetupFac
 
         response.StatusCode.Should().BeOneOf(HttpStatusCode.OK, HttpStatusCode.NoContent);
     }
+
+    [SkippableFact]
+    public async Task GetAllByMotoboy_ReturnsList()
+    {
+        Skip.IfNot(factory.Db.IsAvailable, factory.Db.UnavailableReason);
+
+        var client = factory.CreateClient().WithMotoboyAuth();
+        var moto = await CreateMotoAsync(client);
+        var motoboy = await CreateMotoboyAsync(client, "A");
+        var rentalId = $"locacao-{Guid.NewGuid():N}";
+        var start = DateTime.UtcNow.Date.AddDays(1);
+
+        await client.PostAsJsonAsync("/locacao", new
+        {
+            identificador = rentalId,
+            entregador_id = motoboy,
+            moto_id = moto,
+            data_inicio = start,
+            data_termino = start.AddDays(7),
+            data_previsao_termino = start.AddDays(7),
+            plano = 7,
+        });
+
+        var response = await client.GetAsync($"/locacao?entregador_id={motoboy}");
+
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        var body = await response.Content.ReadAsStringAsync();
+        using var doc = JsonDocument.Parse(body);
+        doc.RootElement.ValueKind.Should().Be(JsonValueKind.Array);
+        doc.RootElement.GetArrayLength().Should().BeGreaterThan(0);
+    }
 }

@@ -60,7 +60,7 @@ services:
       dockerfile: ./src/Job.WebApi/Dockerfile
     image: mottu/core-webapi:latest
     container_name: mottu-webapi
-    user: app
+    user: "0:0"
     ports:
       - '5001:8080'
     environment:

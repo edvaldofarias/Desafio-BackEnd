@@ -20,6 +20,14 @@ public class RentalRepository(JobContext context) : IRentalRepository
         return await context.Rents.Where(x => x.Identifier == identifier).FirstOrDefaultAsync(cancellationToken);
     }
 
+    public async Task<IEnumerable<RentalEntity>> GetAllByMotoboyIdAsync(Guid motoboyId, CancellationToken cancellationToken)
+    {
+        return await context.Rents
+            .Where(x => x.IdMotoboy == motoboyId)
+            .OrderByDescending(x => x.Created)
+            .ToListAsync(cancellationToken);
+    }
+
     public async Task<RentalEntity?> GetByMotoIdAsync(Guid id, CancellationToken cancellationToken)
     {
         return await context.Rents.Where(x => x.IdMoto == id).FirstOrDefaultAsync(cancellationToken);

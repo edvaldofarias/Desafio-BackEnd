@@ -91,6 +91,29 @@ public class MotoControllerTest(SetupFactory factory) : IClassFixture<SetupFacto
     }
 
     [SkippableFact]
+    public async Task GetAll_WhenMotoboyAuthenticated_ReturnsOk()
+    {
+        Skip.IfNot(factory.Db.IsAvailable, factory.Db.UnavailableReason);
+
+        var admin = factory.CreateClient().WithAdminAuth();
+        await admin.PostAsJsonAsync("/motos", new
+        {
+            identificador = $"moto-{Guid.NewGuid():N}",
+            ano = 2024,
+            modelo = "Mottu Sport",
+            placa = $"MTO{_faker.Random.Number(1000, 9999)}",
+        });
+
+        var motoboy = factory.CreateClient().WithMotoboyAuth();
+        var response = await motoboy.GetAsync("/motos");
+
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        var body = await response.Content.ReadAsStringAsync();
+        using var doc = JsonDocument.Parse(body);
+        doc.RootElement.ValueKind.Should().Be(JsonValueKind.Array);
+    }
+
+    [SkippableFact]
     public async Task UpdatePlate_WhenValid_ReturnsSuccess()
     {
         Skip.IfNot(factory.Db.IsAvailable, factory.Db.UnavailableReason);

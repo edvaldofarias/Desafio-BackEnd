@@ -7,6 +7,8 @@ public sealed record RentalDto(
     [property: JsonPropertyName("valor_diaria")] decimal DailyValue,
     [property: JsonPropertyName("entregador_id")] string MotoboyIdentifier,
     [property: JsonPropertyName("moto_id")] string MotoIdentifier,
+    [property: JsonPropertyName("moto_modelo")] string MotoModel,
+    [property: JsonPropertyName("moto_placa")] string MotoPlate,
     [property: JsonPropertyName("data_inicio")] DateTime DateStart,
     [property: JsonPropertyName("data_termino")] DateTime DateEnd,
     [property: JsonPropertyName("data_previsao_termino")] DateTime DatePreview,

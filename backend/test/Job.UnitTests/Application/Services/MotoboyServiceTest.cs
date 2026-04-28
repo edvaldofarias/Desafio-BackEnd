@@ -1,4 +1,5 @@
 ﻿using Bogus;
+using Job.Application.Commands.Motoboy;
 using Job.Application.Repositories;
 using Job.Application.Services;
 using Job.Commons.Domain.Commands.User.Motoboy;
@@ -120,5 +121,56 @@ public class MotoboyServiceTest
 
         response.Should().BeFailure();
         _repository.Verify(x => x.CreateAsync(It.IsAny<MotoboyEntity>(), _cancellationToken), Times.Never);
+    }
+
+    [Fact]
+    public async Task UploadCnh_WhenImageExceeds1Mb_ShouldFail()
+    {
+        var motoboy = MotoboyEntityFaker.Default().Generate();
+        _repository.Setup(x => x.GetByIdentifierAsync(motoboy.Identifier, _cancellationToken))
+            .ReturnsAsync(motoboy);
+
+        var bytes = new byte[(1024 * 1024) + 1];
+        bytes[0] = 0x89;
+        bytes[1] = 0x50;
+        bytes[2] = 0x4E;
+        bytes[3] = 0x47;
+        var base64 = Convert.ToBase64String(bytes);
+        var command = new UploadCnhMotoboyCommand
+        {
+            Identifier = motoboy.Identifier,
+            CnhImage = base64
+        };
+
+        var response = await _motoboyService.Handle(command, _cancellationToken);
+
+        response.Should().BeFailure();
+        response.Errors.Should().Contain(x => x.Message.Contains("1 MB"));
+        _fileStorage.Verify(x => x.SaveAsync(It.IsAny<string>(), It.IsAny<Stream>(), _cancellationToken), Times.Never);
+        _repository.Verify(x => x.UpdateAsync(It.IsAny<MotoboyEntity>(), _cancellationToken), Times.Never);
+    }
+
+    [Fact]
+    public async Task UploadCnh_WhenJpegImage_ShouldSaveSuccessfully()
+    {
+        var motoboy = MotoboyEntityFaker.Default().Generate();
+        _repository.Setup(x => x.GetByIdentifierAsync(motoboy.Identifier, _cancellationToken))
+            .ReturnsAsync(motoboy);
+        _fileStorage.Setup(x => x.SaveAsync("cnh.jpg", It.IsAny<Stream>(), _cancellationToken))
+            .ReturnsAsync("uploads/cnh.jpg");
+
+        var jpegBytes = new byte[] { 0xFF, 0xD8, 0xFF, 0xDB, 0x00, 0x01 };
+        var base64 = Convert.ToBase64String(jpegBytes);
+        var command = new UploadCnhMotoboyCommand
+        {
+            Identifier = motoboy.Identifier,
+            CnhImage = $"data:image/jpeg;base64,{base64}"
+        };
+
+        var response = await _motoboyService.Handle(command, _cancellationToken);
+
+        response.Should().BeSuccess();
+        _fileStorage.Verify(x => x.SaveAsync("cnh.jpg", It.IsAny<Stream>(), _cancellationToken), Times.Once);
+        _repository.Verify(x => x.UpdateAsync(It.IsAny<MotoboyEntity>(), _cancellationToken), Times.Once);
     }
 }

@@ -17,8 +17,30 @@ public sealed class RentalService(
     IMotoRepository motoRepository) :
     IRequestHandler<CancelRentalCommand, Result<RentalDto>>,
     IRequestHandler<CreateRentalCommand, Result<RentalDto>>,
-    IRequestHandler<GetRentalCommand, Result<RentalDto>>
+    IRequestHandler<GetRentalCommand, Result<RentalDto>>,
+    IRequestHandler<GetAllRentalCommand, Result<IEnumerable<RentalDto>>>
 {
+    public async Task<Result<IEnumerable<RentalDto>>> Handle(GetAllRentalCommand request, CancellationToken cancellationToken)
+    {
+        if (string.IsNullOrWhiteSpace(request.MotoboyIdentifier))
+            return Result.Fail("Entregador nao informado");
+
+        var motoboy = await motoboyRepository.GetByIdentifierAsync(request.MotoboyIdentifier, cancellationToken);
+        if (motoboy is null)
+            return Result.Fail("Entregador nao encontrado");
+
+        var rents = await rentalRepository.GetAllByMotoboyIdAsync(motoboy.Id, cancellationToken);
+        var items = new List<RentalDto>();
+
+        foreach (var rent in rents)
+        {
+            var moto = await motoRepository.GetByIdAsync(rent.IdMoto, cancellationToken);
+            items.Add(MapToDto(rent, motoboy, moto));
+        }
+
+        return Result.Ok<IEnumerable<RentalDto>>(items);
+    }
+
     public async Task<Result<RentalDto>> Handle(GetRentalCommand request, CancellationToken cancellationToken)
     {
         var rent = await rentalRepository.GetByIdentifierAsync(request.Identifier, cancellationToken);
@@ -87,6 +109,8 @@ public sealed class RentalService(
             rent.DailyValue,
             motoboy?.Identifier ?? string.Empty,
             moto?.Identifier ?? string.Empty,
+            moto?.Model ?? string.Empty,
+            moto?.Plate ?? string.Empty,
             rent.DateStart.ToDateTime(TimeOnly.MinValue),
             rent.DateEnd.ToDateTime(TimeOnly.MinValue),
             rent.DatePreview.ToDateTime(TimeOnly.MinValue),
